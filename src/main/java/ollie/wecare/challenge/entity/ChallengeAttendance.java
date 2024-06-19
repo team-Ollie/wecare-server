@@ -1,11 +1,21 @@
 package ollie.wecare.challenge.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import ollie.wecare.common.Base.BaseEntity;
 import ollie.wecare.user.entity.User;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDateTime;
-
+@Entity
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@DynamicInsert
 public class ChallengeAttendance extends BaseEntity {
 
     @Id
