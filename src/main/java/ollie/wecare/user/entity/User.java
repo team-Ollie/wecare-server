@@ -49,4 +49,6 @@ public class User extends BaseEntity {
     public void logout() {this.setStatus(LOGOUT);}
 
     public void signout() {this.setStatus(INACTIVE);}
+
+    public void editNickname(String nickname) {this.nickname = nickname;}
 }
