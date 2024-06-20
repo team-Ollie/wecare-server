@@ -30,7 +30,8 @@ public enum BaseResponseStatus {
     // program
 
     // challenge
-
+    INVALID_ATTENDANCE_CODE(false, HttpStatus.BAD_REQUEST, "잘못된 인증번호입니다."),
+    INVALID_CHALLENGE_IDX(false, HttpStatus.NOT_FOUND, "잘못된 ChallengeIdx 입니다."),
 
     /**
      * Response 오류

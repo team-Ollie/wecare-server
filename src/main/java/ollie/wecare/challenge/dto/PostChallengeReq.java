@@ -4,4 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class PostChallengeReq {
+    private Long challengeIdx;
 }
