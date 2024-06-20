@@ -51,4 +51,5 @@ public class User extends BaseEntity {
     public void signout() {this.setStatus(INACTIVE);}
 
     public void editNickname(String nickname) {this.nickname = nickname;}
+    public void editPassword(String password) {this.password = password;}
 }
