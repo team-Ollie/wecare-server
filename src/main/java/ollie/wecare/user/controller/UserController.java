@@ -2,10 +2,7 @@ package ollie.wecare.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import ollie.wecare.common.base.BaseResponse;
-import ollie.wecare.user.dto.JwtDto;
-import ollie.wecare.user.dto.LoginRequest;
-import ollie.wecare.user.dto.SignOutRequest;
-import ollie.wecare.user.dto.SignupRequest;
+import ollie.wecare.user.dto.*;
 import ollie.wecare.user.service.AuthService;
 import ollie.wecare.user.service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -42,4 +39,11 @@ public class UserController {
     public BaseResponse<String> signOut(@RequestBody SignOutRequest signoutRequest) {
         return userService.signout(authService.getUserIdx(), signoutRequest);
     }
+
+    // access token 재발급
+    @PostMapping("/reissue-token")
+    public BaseResponse<TokenResponse> reissueToken(@RequestBody ReissueTokenRequest reissueTokenRequest) {
+        return userService.reissueAccessToken(reissueTokenRequest);
+    }
+
 }

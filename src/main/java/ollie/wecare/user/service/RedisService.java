@@ -39,4 +39,8 @@ public class RedisService {
         return accessTokenExpirationTime.getTime() - (new Date()).getTime();
     }
 
+    public String getToken(Long userIdx){
+        return redisTemplate.opsForValue().get(String.valueOf(userIdx));
+    }
+
 }
