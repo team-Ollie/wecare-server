@@ -8,7 +8,7 @@ import ollie.wecare.challenge.entity.Challenge;
 import ollie.wecare.challenge.entity.ChallengeAttendance;
 import ollie.wecare.challenge.repository.ChallengeAttendanceRepository;
 import ollie.wecare.challenge.repository.ChallengeRepository;
-import ollie.wecare.common.Base.BaseException;
+import ollie.wecare.common.base.BaseException;
 import ollie.wecare.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static ollie.wecare.common.Base.BaseResponseStatus.*;
+import static ollie.wecare.common.base.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -47,13 +47,13 @@ public class ChallengeService {
         //TODO : userIdx 처리
         Long tmpUserIdx = 1L;
 
-        Challenge challenge = challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE));
+        Challenge challenge = challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX));
         if(!challenge.getAttendanceCode().equals(attendChallengeReq.getAttendanceCode()))
-            throw new BaseException(ATTENDANCE_FAIL);
+            throw new BaseException(INVALID_ATTENDANCE_CODE);
         else {
             ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                    .user(userRepository.findById(tmpUserIdx).orElseThrow(()->new BaseException(INVALID_USER)))
-                    .challenge(challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE)))
+                    .user(userRepository.findById(tmpUserIdx).orElseThrow(()->new BaseException(INVALID_USER_IDX)))
+                    .challenge(challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
                     .attendanceDate(LocalDateTime.now()).build();
             challengeAttendanceRepository.save(challengeAttendance);
         }
@@ -63,8 +63,8 @@ public class ChallengeService {
     public void participateChallenge(PostChallengeReq postChallengeReq) throws BaseException {
         //TODO : USERidx 처리
         ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                .user(userRepository.findById(2L).orElseThrow(()->new BaseException(INVALID_USER)))
-                .challenge(challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE)))
+                .user(userRepository.findById(2L).orElseThrow(()->new BaseException(INVALID_USER_IDX)))
+                .challenge(challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
                 .attendanceDate(LocalDateTime.now()).build();
         challengeAttendanceRepository.save(challengeAttendance);
         //TODO : 이미 참여중인 챌린지 처리

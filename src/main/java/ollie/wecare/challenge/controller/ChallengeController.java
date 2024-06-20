@@ -6,14 +6,14 @@ import ollie.wecare.challenge.dto.AttendChallengeReq;
 import ollie.wecare.challenge.dto.GetChallengesRes;
 import ollie.wecare.challenge.dto.PostChallengeReq;
 import ollie.wecare.challenge.service.ChallengeService;
-import ollie.wecare.common.Base.BaseException;
-import ollie.wecare.common.Base.BaseResponse;
+import ollie.wecare.common.base.BaseException;
+import ollie.wecare.common.base.BaseResponse;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static ollie.wecare.common.Base.BaseResponseStatus.SUCCESS;
+import static ollie.wecare.common.base.BaseResponseStatus.SUCCESS;
 
 @RestController
 @RequestMapping("/challenges")
