@@ -46,4 +46,10 @@ public class UserController {
         return userService.reissueAccessToken(reissueTokenRequest);
     }
 
+    // 닉네임 중복 체크
+    @PostMapping("/nickname")
+    public BaseResponse<String> validateNickname(@RequestBody NicknameRequest nicknameRequest) {
+        return userService.validateNickname(nicknameRequest.nickname());
+    }
+
 }
