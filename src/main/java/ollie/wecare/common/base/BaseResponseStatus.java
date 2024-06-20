@@ -14,6 +14,8 @@ public enum BaseResponseStatus {
      * Request 오류
      */
     // user
+    INVALID_CENTER_IDX(false, HttpStatus.NOT_FOUND, "잘못된 Center Idx입니다."),
+    INVALID_IDENTIFIER(false, HttpStatus.BAD_REQUEST, "식별번호는 이름+전화번호 뒷자리 4자리 형식이어야 합니다. ex. 홍길동1234"),
 
     // program
 
