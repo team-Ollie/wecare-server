@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ollie.wecare.common.base.BaseResponse;
 import ollie.wecare.user.dto.JwtDto;
 import ollie.wecare.user.dto.LoginRequest;
+import ollie.wecare.user.dto.SignOutRequest;
 import ollie.wecare.user.dto.SignupRequest;
 import ollie.wecare.user.service.AuthService;
 import ollie.wecare.user.service.UserService;
@@ -34,5 +35,11 @@ public class UserController {
     @PatchMapping("/logout")
     public BaseResponse<String> logout() {
         return userService.logout(authService.getUserIdx());
+    }
+
+    // 회원 탈퇴
+    @PatchMapping("/signout")
+    public BaseResponse<String> signOut(@RequestBody SignOutRequest signoutRequest) {
+        return userService.signout(authService.getUserIdx(), signoutRequest);
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Date;
 
+import static ollie.wecare.common.constants.Constants.INACTIVE;
 import static ollie.wecare.common.constants.Constants.LOGOUT;
 
 @Service
@@ -87,6 +88,15 @@ public class AuthService {
 
         redisService.deleteFromRedis(userIdx);
         redisService.registerBlackList(accessToken, LOGOUT);
+    }
+
+    // 회원 탈퇴
+    public void signout(Long userIdx) throws BaseException {
+        // 토큰 유효성 검사
+        String accessToken = getTokenFromRequest();
+
+        redisService.deleteFromRedis(userIdx);
+        redisService.registerBlackList(accessToken, INACTIVE);
     }
 
     public String getTokenFromRequest() {
