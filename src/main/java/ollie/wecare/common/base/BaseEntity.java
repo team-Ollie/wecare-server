@@ -1,4 +1,4 @@
-package ollie.wecare.common.Base;
+package ollie.wecare.common.base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
