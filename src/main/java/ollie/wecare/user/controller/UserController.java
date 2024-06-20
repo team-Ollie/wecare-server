@@ -52,4 +52,10 @@ public class UserController {
         return userService.validateNickname(nicknameRequest.nickname());
     }
 
+    // 아이디 중복 체크
+    @PostMapping("/loginId")
+    public BaseResponse<String> validateLoginId(@RequestBody LoginIdRequest loginIdRequest) {
+        return userService.validateLoginId(loginIdRequest.loginId());
+    }
+
 }
