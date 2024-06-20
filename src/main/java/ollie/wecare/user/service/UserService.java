@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -163,5 +164,14 @@ public class UserService {
 
         MyPageResponse myPageResponse = new MyPageResponse(user.getNickname(), user.getLevel());
         return new BaseResponse<>(myPageResponse);
+    }
+
+    // 회원가입 화면 조회(지원센터 목록 조회)
+    public BaseResponse<SignupViewResponse> getSignupView() {
+        List<CenterListDto> centerList = centerRepository.findAll().stream()
+                .map(center -> new CenterListDto(center.getCenterIdx(), center.getName())).toList();
+        SignupViewResponse signupViewResponse = new SignupViewResponse(centerList);
+
+        return new BaseResponse<>(signupViewResponse);
     }
 }

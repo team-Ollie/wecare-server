@@ -75,4 +75,10 @@ public class UserController {
     public BaseResponse<MyPageResponse> getMyPage() {
         return userService.getMyPage(authService.getUserIdx());
     }
+
+    // 회원가입 화면 조회
+    @GetMapping("/signupView")
+    public BaseResponse<SignupViewResponse> getSignupView() {
+        return userService.getSignupView();
+    }
 }
