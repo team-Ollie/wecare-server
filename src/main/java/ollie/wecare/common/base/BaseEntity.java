@@ -1,11 +1,10 @@
-package ollie.wecare.common.Base;
+package ollie.wecare.common.base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -15,8 +14,11 @@ import java.time.LocalDateTime;
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-@DynamicInsert
-public abstract class BaseEntity {
+public class BaseEntity {
+
+    @Column(columnDefinition = "varchar(10) default 'active'")
+    @Setter
+    private String status;
 
     @CreatedDate
     @Column(updatable = false)
@@ -24,8 +26,4 @@ public abstract class BaseEntity {
 
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
-
-    @Column(columnDefinition = "varchar(10) default 'active'")
-    @Setter
-    private String status;
 }
