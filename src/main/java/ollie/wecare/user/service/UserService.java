@@ -50,6 +50,7 @@ public class UserService {
                 encoder.encode(signupRequest.password()),
                 signupRequest.nickname(),
                 signupRequest.identifier(),
+                1,
                 center);
     }
 
