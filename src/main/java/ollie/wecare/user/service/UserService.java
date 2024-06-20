@@ -155,4 +155,12 @@ public class UserService {
         userRepository.save(user);
         return new BaseResponse<>(SUCCESS);
     }
+
+    // 마이페이지 조회
+    public BaseResponse<MyPageResponse> getMyPage(Long userIdx) {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+        MyPageResponse myPageResponse = new MyPageResponse(user.getNickname(), user.getLevel());
+        return new BaseResponse<>(myPageResponse);
+    }
 }
