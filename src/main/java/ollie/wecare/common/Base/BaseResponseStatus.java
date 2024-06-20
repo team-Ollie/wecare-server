@@ -13,12 +13,12 @@ public enum BaseResponseStatus {
      * 2000: Request 오류
      */
     // user(2000-2099)
-
+    INVALID_USER(false, 2001, "존재하지 않는 유저입니다."),
     // program(2100-2199)
 
     // challenge(2200-2299)
-
-
+    ATTENDANCE_FAIL(false, 2201, "인증번호가 일치하지 않습니다."),
+    INVALID_CHALLENGE(false, 2202, "존재하지 않는 챌린지입니다."),
     /**
      * 3000: Response 오류
      */
