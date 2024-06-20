@@ -23,6 +23,9 @@ public enum BaseResponseStatus {
     DUPLICATED_NICKNAME(false, HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다."),
     DUPLICATED_LOGIN_ID(false, HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
     INVALID_NICKNAME(false, HttpStatus.BAD_REQUEST, "잘못된 닉네임 형식입니다."),
+    INVALID_PASSWORD(false, HttpStatus.BAD_REQUEST, "잘못된 비밀번호 형식입니다."),
+
+
 
     // program
 
