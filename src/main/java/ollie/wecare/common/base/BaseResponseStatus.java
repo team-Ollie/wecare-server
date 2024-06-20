@@ -22,6 +22,7 @@ public enum BaseResponseStatus {
     INVALID_REFRESH_TOKEN(false, HttpStatus.NOT_FOUND, "resresh token이 비어 있습니다."),
     DUPLICATED_NICKNAME(false, HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다."),
     DUPLICATED_LOGIN_ID(false, HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
+    INVALID_NICKNAME(false, HttpStatus.BAD_REQUEST, "잘못된 닉네임 형식입니다."),
 
     // program
 

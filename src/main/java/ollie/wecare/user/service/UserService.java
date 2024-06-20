@@ -131,4 +131,16 @@ public class UserService {
         if (userRepository.existsByLoginId(loginId)) throw new BaseException(DUPLICATED_LOGIN_ID);
         return new BaseResponse<>(SUCCESS);
     }
+
+    // 닉네임 수정
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<String> modifyNickname(Long userIdx, EditNicknameRequest editNicknameRequest) {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        if (editNicknameRequest.nickname().equals("") || editNicknameRequest.nickname().equals(" ")) throw new BaseException(INVALID_NICKNAME);
+        validateNickname(editNicknameRequest.nickname());
+        user.editNickname(editNicknameRequest.nickname());
+        userRepository.save(user);
+
+        return new BaseResponse<>(SUCCESS);
+    }
 }

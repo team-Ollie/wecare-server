@@ -58,4 +58,10 @@ public class UserController {
         return userService.validateLoginId(loginIdRequest.loginId());
     }
 
+    // 닉네임 수정
+    @PatchMapping("/editNickname")
+    public BaseResponse<String> modifyNickname(@RequestBody EditNicknameRequest editNicknameRequest) {
+        return userService.modifyNickname(authService.getUserIdx(), editNicknameRequest);
+    }
+
 }
