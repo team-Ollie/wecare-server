@@ -5,6 +5,7 @@ import ollie.wecare.common.base.BaseException;
 import ollie.wecare.common.base.BaseResponse;
 import ollie.wecare.common.enums.Role;
 import ollie.wecare.user.dto.JwtDto;
+import ollie.wecare.user.dto.LoginRequest;
 import ollie.wecare.user.dto.SignupRequest;
 import ollie.wecare.user.entity.Center;
 import ollie.wecare.user.entity.User;
@@ -17,8 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static ollie.wecare.common.base.BaseResponseStatus.INVALID_CENTER_IDX;
-import static ollie.wecare.common.base.BaseResponseStatus.INVALID_IDENTIFIER;
+import static ollie.wecare.common.base.BaseResponseStatus.*;
 import static ollie.wecare.common.constants.Constants.ACTIVE;
 
 @Service
@@ -63,5 +63,29 @@ public class UserService {
         Matcher matcher = regex.matcher(identifier);
 
         return matcher.matches();
+    }
+
+    // 로그인
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<JwtDto> login(LoginRequest loginRequest) {
+        User user = userRepository.findByLoginId(loginRequest.loginId()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        if(!encoder.matches(loginRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
+
+        JwtDto jwtDto = authService.generateToken(user.getUserIdx());
+
+        user.login();
+        userRepository.save(user);
+        return new BaseResponse<>(jwtDto);
+    }
+
+    // 로그아웃
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<String> logout(Long userIdx) {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        authService.logout(userIdx);
+
+        user.logout();
+        userRepository.save(user);
+        return new BaseResponse<>(SUCCESS);
     }
 }
