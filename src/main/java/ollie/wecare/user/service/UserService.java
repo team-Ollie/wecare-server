@@ -6,6 +6,7 @@ import ollie.wecare.common.base.BaseResponse;
 import ollie.wecare.common.enums.Role;
 import ollie.wecare.user.dto.JwtDto;
 import ollie.wecare.user.dto.LoginRequest;
+import ollie.wecare.user.dto.SignOutRequest;
 import ollie.wecare.user.dto.SignupRequest;
 import ollie.wecare.user.entity.Center;
 import ollie.wecare.user.entity.User;
@@ -85,6 +86,18 @@ public class UserService {
         authService.logout(userIdx);
 
         user.logout();
+        userRepository.save(user);
+        return new BaseResponse<>(SUCCESS);
+    }
+
+    // 회원 탈퇴
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<String> signout(Long userIdx, SignOutRequest signoutRequest) {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        if (!encoder.matches(signoutRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
+        authService.signout(userIdx);
+
+        user.signout();
         userRepository.save(user);
         return new BaseResponse<>(SUCCESS);
     }
