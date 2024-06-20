@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ollie.wecare.common.base.BaseException;
 import ollie.wecare.common.base.BaseResponse;
 import ollie.wecare.common.enums.Role;
-import ollie.wecare.user.dto.JwtDto;
-import ollie.wecare.user.dto.LoginRequest;
-import ollie.wecare.user.dto.SignOutRequest;
-import ollie.wecare.user.dto.SignupRequest;
+import ollie.wecare.user.dto.*;
 import ollie.wecare.user.entity.Center;
 import ollie.wecare.user.entity.User;
 import ollie.wecare.user.repository.CenterRepository;
@@ -30,6 +27,7 @@ public class UserService {
     private final BCryptPasswordEncoder encoder;
     private final CenterRepository centerRepository;
     private final AuthService authService;
+    private final RedisService redisService;
 
 
     // 회원가입
@@ -100,5 +98,25 @@ public class UserService {
         user.signout();
         userRepository.save(user);
         return new BaseResponse<>(SUCCESS);
+    }
+
+    // access token 재발급
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<TokenResponse> reissueAccessToken(ReissueTokenRequest reissueTokenRequest) {
+        User user = userRepository.findByLoginIdAndStatusEquals(reissueTokenRequest.loginId(), ACTIVE).orElseThrow(() -> new BaseException(NO_MATCH_USER));
+        validateRefreshToken(reissueTokenRequest, user.getUserIdx());
+
+        // refresh token이 유효한 경우 access token 재발급
+        return new BaseResponse<>(new TokenResponse(authService.generateAccessToken(user.getUserIdx())));
+    }
+
+    // refreshToken 유효성 체크
+    private void validateRefreshToken(ReissueTokenRequest reissueTokenRequest, Long userIdx) {
+        String refreshTokenFromRequest = reissueTokenRequest.refreshToken();
+        if (refreshTokenFromRequest == null || refreshTokenFromRequest.isEmpty())
+            throw new BaseException(INVALID_REFRESH_TOKEN);
+
+        String refreshTokenFromRedis = redisService.getToken(userIdx);
+        if(!refreshTokenFromRedis.equals(refreshTokenFromRequest)) throw new BaseException(INVALID_REFRESH_TOKEN);
     }
 }

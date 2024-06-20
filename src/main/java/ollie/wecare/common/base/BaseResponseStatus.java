@@ -18,6 +18,8 @@ public enum BaseResponseStatus {
     INVALID_IDENTIFIER(false, HttpStatus.BAD_REQUEST, "식별번호는 이름+전화번호 뒷자리 4자리 형식이어야 합니다. ex. 홍길동1234"),
     INVALID_USER_IDX(false, HttpStatus.NOT_FOUND, "잘못된 UserIdx 입니다."),
     WRONG_PASSWORD(false, HttpStatus.CONFLICT, "비밀번호가 틀렸습니다."),
+    NO_MATCH_USER(false, HttpStatus.NOT_FOUND, "아이디에 맞는 user가 없습니다."),
+    INVALID_REFRESH_TOKEN(false, HttpStatus.NOT_FOUND, "resresh token이 비어 있습니다."),
 
     // program
 
