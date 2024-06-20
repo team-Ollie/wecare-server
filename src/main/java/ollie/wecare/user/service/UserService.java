@@ -119,4 +119,10 @@ public class UserService {
         String refreshTokenFromRedis = redisService.getToken(userIdx);
         if(!refreshTokenFromRedis.equals(refreshTokenFromRequest)) throw new BaseException(INVALID_REFRESH_TOKEN);
     }
+
+    // 닉네임 중복 체크
+    public BaseResponse<String> validateNickname(String nickname) {
+        if (userRepository.existsByNickname(nickname)) throw new BaseException(DUPLICATED_NICKNAME);
+        return new BaseResponse<>(SUCCESS);
+    }
 }
