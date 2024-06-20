@@ -29,17 +29,21 @@ public class User extends BaseEntity {
 
     private String identifier; //홍길동1234
 
+    @Column(nullable = false, columnDefinition = "integer default 1")
+    private Integer level;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "center_idx")
     private Center center;
 
     @Builder
-    public User(Role role, String loginId, String password, String nickname, String identifier, Center center) {
+    public User(Role role, String loginId, String password, String nickname, String identifier, Integer level, Center center) {
         this.role = role;
         this.loginId = loginId;
         this.password = password;
         this.nickname = nickname;
         this.identifier = identifier;
+        this.level = level;
         this.center = center;
     }
 
