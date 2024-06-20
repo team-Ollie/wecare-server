@@ -125,4 +125,10 @@ public class UserService {
         if (userRepository.existsByNickname(nickname)) throw new BaseException(DUPLICATED_NICKNAME);
         return new BaseResponse<>(SUCCESS);
     }
+
+    // 아이디 중복 체크
+    public BaseResponse<String> validateLoginId(String loginId) {
+        if (userRepository.existsByLoginId(loginId)) throw new BaseException(DUPLICATED_LOGIN_ID);
+        return new BaseResponse<>(SUCCESS);
+    }
 }
