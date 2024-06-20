@@ -3,12 +3,19 @@ package ollie.wecare.user.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import ollie.wecare.common.base.BaseException;
 import ollie.wecare.user.dto.JwtDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Date;
+
+import static ollie.wecare.common.constants.Constants.LOGOUT;
 
 @Service
 @RequiredArgsConstructor
@@ -55,5 +62,39 @@ public class AuthService {
                 .compact();
         redisService.signup(userIdx, refreshToken);
         return refreshToken;
+    }
+
+    // request에서 userIdx 추출
+    public Long getUserIdx() throws BaseException {
+        String token = getTokenFromRequest();
+        if (token == null || token.equals("")) return null;
+        return getUserIdxFromToken(token);
+    }
+
+    // 토큰에서 userIdx 추출
+    public Long getUserIdxFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userIdx", Long.class);
+    }
+
+    // 로그아웃
+    public void logout(Long userIdx) throws BaseException {
+        // 토큰 유효성 검사
+        String accessToken = getTokenFromRequest();
+
+        redisService.deleteFromRedis(userIdx);
+        redisService.registerBlackList(accessToken, LOGOUT);
+    }
+
+    public String getTokenFromRequest() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        else return null;
     }
 }

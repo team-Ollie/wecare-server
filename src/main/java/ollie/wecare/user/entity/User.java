@@ -7,6 +7,7 @@ import ollie.wecare.common.enums.Role;
 import org.hibernate.annotations.DynamicInsert;
 
 import static ollie.wecare.common.constants.Constants.ACTIVE;
+import static ollie.wecare.common.constants.Constants.LOGOUT;
 
 @Entity
 @Getter
@@ -46,4 +47,5 @@ public class User extends BaseEntity {
     public void login() {
         this.setStatus(ACTIVE);
     }
+    public void logout() {this.setStatus(LOGOUT);}
 }

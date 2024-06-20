@@ -77,4 +77,15 @@ public class UserService {
         userRepository.save(user);
         return new BaseResponse<>(jwtDto);
     }
+
+    // 로그아웃
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<String> logout(Long userIdx) {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        authService.logout(userIdx);
+
+        user.logout();
+        userRepository.save(user);
+        return new BaseResponse<>(SUCCESS);
+    }
 }

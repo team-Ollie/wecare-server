@@ -5,11 +5,9 @@ import ollie.wecare.common.base.BaseResponse;
 import ollie.wecare.user.dto.JwtDto;
 import ollie.wecare.user.dto.LoginRequest;
 import ollie.wecare.user.dto.SignupRequest;
+import ollie.wecare.user.service.AuthService;
 import ollie.wecare.user.service.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static ollie.wecare.common.constants.RequestURI.user;
 
@@ -18,6 +16,7 @@ import static ollie.wecare.common.constants.RequestURI.user;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final AuthService authService;
 
     // 회원가입
     @PostMapping(value = "/signup")
@@ -29,5 +28,11 @@ public class UserController {
     @PostMapping("/login")
     public BaseResponse<JwtDto> login(@RequestBody LoginRequest loginRequest) {
         return userService.login(loginRequest);
+    }
+
+    // 로그아웃
+    @PatchMapping("/logout")
+    public BaseResponse<String> logout() {
+        return userService.logout(authService.getUserIdx());
     }
 }
