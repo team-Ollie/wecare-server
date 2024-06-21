@@ -23,6 +23,7 @@ public enum BaseResponseStatus {
     DUPLICATED_LOGIN_ID(false, HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
     INVALID_NICKNAME(false, HttpStatus.BAD_REQUEST, "잘못된 닉네임 형식입니다."),
     INVALID_PASSWORD(false, HttpStatus.BAD_REQUEST, "잘못된 비밀번호 형식입니다."),
+    INVALID_ROLE(false, HttpStatus.FORBIDDEN, "허용되지 않은 권한입니다."),
 
     // jwt
     INVALID_JWT_SIGNATURE(false, HttpStatus.BAD_REQUEST, "유효하지 않은 JWT 시그니처입니다."),
