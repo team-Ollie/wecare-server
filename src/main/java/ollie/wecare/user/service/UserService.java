@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -173,5 +174,13 @@ public class UserService {
         SignupViewResponse signupViewResponse = new SignupViewResponse(centerList);
 
         return new BaseResponse<>(signupViewResponse);
+    }
+
+    public User getUserByUserIdx(Long userIdx) {
+        if(userIdx == null) return null;
+        else {
+            Optional<User> user = userRepository.findByUserIdx(userIdx);
+            return user.orElse(null);
+        }
     }
 }
