@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ollie.wecare.common.Base.BaseEntity;
+import ollie.wecare.common.base.BaseEntity;
 import ollie.wecare.program.entity.Program;
 import ollie.wecare.user.entity.User;
 import org.hibernate.annotations.DynamicInsert;

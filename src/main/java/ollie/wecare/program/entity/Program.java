@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ollie.wecare.common.Base.BaseEntity;
+import ollie.wecare.common.base.BaseEntity;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDateTime;
