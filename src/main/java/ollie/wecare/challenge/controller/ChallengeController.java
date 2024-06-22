@@ -2,13 +2,10 @@ package ollie.wecare.challenge.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import ollie.wecare.challenge.dto.AttendChallengeReq;
-import ollie.wecare.challenge.dto.GetChallengesRes;
-import ollie.wecare.challenge.dto.PostChallengeReq;
+import ollie.wecare.challenge.dto.*;
 import ollie.wecare.challenge.service.ChallengeService;
 import ollie.wecare.common.base.BaseException;
 import ollie.wecare.common.base.BaseResponse;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,13 +37,18 @@ public class ChallengeController {
         challengeService.attendChallenge(attendChallengeReq);
         return new BaseResponse<>(SUCCESS);
     }
-/*
-    @GetMapping
+
+    /*
+     * 챌린지 참여 현황 조회(월별)
+     * */
+    @GetMapping("/attendance/{challengeIdx}")
     @ResponseBody
-    public BaseResponse<List<GetChallengesRes>> getChallenges(HttpServletRequest request) throws BaseException {
-        return new BaseResponse<>(challengeService.getChallenges());
+    public BaseResponse<List<GetAttendanceRes>> getAttendance(@PathVariable("challengeIdx") Long challengeIdx,
+                                                        @RequestParam(value = "year", required = false, defaultValue = "0") Long year,
+                                                        @RequestParam(value = "month", required = false, defaultValue = "0") Long month) {
+        return new BaseResponse<>(challengeService.getAttendance(challengeIdx, year, month));
     }
-*/
+
     /*
     * 새로운 챌린지 참여
     * */
@@ -63,7 +65,16 @@ public class ChallengeController {
     * */
     @GetMapping("/search")
     @ResponseBody
-    public BaseResponse<List<GetChallengesRes>> getChallenges(@Param("searchWord") String searchWord)throws BaseException {
+    public BaseResponse<List<GetChallengesRes>> getChallenges(@RequestParam(value = "searhWord", defaultValue = "", required = false) String searchWord)throws BaseException {
         return new BaseResponse<>(challengeService.getChallenges(searchWord));
+    }
+
+    /*
+    * 챌린지 광고 조회
+    * */
+    @GetMapping("/ads")
+    @ResponseBody
+    public BaseResponse<GetChallengeAdsRes> getChallengeAds() {
+        return new BaseResponse<>(challengeService.getChallengeAds());
     }
 }

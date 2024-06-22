@@ -14,6 +14,9 @@ import ollie.wecare.user.repository.UserRepository;
 import ollie.wecare.user.service.AuthService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 
 import static ollie.wecare.common.base.BaseResponseStatus.INVALID_ROLE;
@@ -28,9 +31,17 @@ public class ProgramService {
     private final ChallengeRepository challengeRepository;
 
     private final UserRepository userRepository;
-    public List<GetProgramRes> getPrograms(Long month) {
-        //programRepository.findByDueDate
-        return null;
+    public List<GetProgramRes> getPrograms(Long year, Long month) {
+        int y = year.intValue();
+        int m = month.intValue();
+
+        LocalDateTime firstDay = LocalDate.of(y, m, 1).atStartOfDay();
+        LocalDateTime lastDay = LocalDate.of(y, m, 1).atStartOfDay();
+        if(year == 0) {
+            firstDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atDay(1).atStartOfDay();
+            lastDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atEndOfMonth().atStartOfDay();
+        }
+        return programRepository.findByDueDateBetween(firstDay, lastDay).stream().map(program -> GetProgramRes.fromProgram(program)).toList();
     }
 
     public void saveProgram(PostProgramReq postProgramReq) throws BaseException {

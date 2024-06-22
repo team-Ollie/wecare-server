@@ -19,6 +19,7 @@ public class User extends BaseEntity {
     @Column(name = "user_idx")
     private Long userIdx;
 
+    @Enumerated(value = EnumType.STRING)
     private Role role;
 
     private String loginId;
