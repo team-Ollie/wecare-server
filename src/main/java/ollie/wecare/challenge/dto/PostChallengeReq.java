@@ -1,8 +1,11 @@
 package ollie.wecare.challenge.dto;
 
-import lombok.Getter;
+import lombok.*;
 
-@Getter
+@Data
+@AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class PostChallengeReq {
     private Long challengeIdx;
 }
