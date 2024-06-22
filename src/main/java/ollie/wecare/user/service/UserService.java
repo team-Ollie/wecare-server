@@ -154,7 +154,7 @@ public class UserService {
         if (!encoder.matches(editPasswordRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
         if (editPasswordRequest.newPassword().equals("") || editPasswordRequest.newPassword().equals(" ")) throw new BaseException(INVALID_PASSWORD);
 
-        user.editPassword(editPasswordRequest.newPassword());
+        user.editPassword(encoder.encode(editPasswordRequest.newPassword()));
         userRepository.save(user);
         return new BaseResponse<>(SUCCESS);
     }
