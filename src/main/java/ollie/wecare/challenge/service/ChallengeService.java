@@ -77,9 +77,11 @@ public class ChallengeService {
         return challengeRepository.findByNameContaining(searchWord).stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, 0L)).toList();
     }
 
-    public List<GetAttendanceRes> getAttendance(Long challengeIdx, int year, int month) {
-        LocalDateTime firstDay = LocalDate.of(year, month, 1).atStartOfDay();
-        LocalDateTime lastDay = LocalDate.of(year, month, 1).atStartOfDay();
+    public List<GetAttendanceRes> getAttendance(Long challengeIdx, Long year, Long month) {
+        int y = year.intValue();
+        int m = month.intValue();
+        LocalDateTime firstDay = LocalDate.of(y, m, 1).atStartOfDay();
+        LocalDateTime lastDay = LocalDate.of(y, m, 1).atStartOfDay();
         if(year == 0) {
             firstDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atDay(1).atStartOfDay();
             lastDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atEndOfMonth().atStartOfDay();

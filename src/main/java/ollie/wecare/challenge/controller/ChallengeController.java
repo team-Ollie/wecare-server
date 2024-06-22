@@ -48,8 +48,8 @@ public class ChallengeController {
     @GetMapping("/attendance/{challengeIdx}")
     @ResponseBody
     public BaseResponse<List<GetAttendanceRes>> getAttendance(@PathVariable("challengeIdx") Long challengeIdx,
-                                                        @RequestParam(value = "year", required = false, defaultValue = "0") int year,
-                                                        @RequestParam(value = "month", required = false, defaultValue = "0") int month) {
+                                                        @RequestParam(value = "year", required = false, defaultValue = "0") Long year,
+                                                        @RequestParam(value = "month", required = false, defaultValue = "0") Long month) {
         return new BaseResponse<>(challengeService.getAttendance(challengeIdx, year, month));
     }
 
