@@ -64,7 +64,7 @@ public class UserController {
         return userService.editNickname(authService.getUserIdx(), editNicknameRequest);
     }
 
-    // 비밀번호 변현
+    // 비밀번호 변경
     @PatchMapping("/editPassword")
     public BaseResponse<String> modifyPassword(@RequestBody EditPasswordRequest editPasswordRequest) {
         return userService.editPassword(authService.getUserIdx(), editPasswordRequest);
