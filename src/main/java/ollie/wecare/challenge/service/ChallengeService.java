@@ -2,6 +2,7 @@ package ollie.wecare.challenge.service;
 
 import lombok.RequiredArgsConstructor;
 import ollie.wecare.challenge.dto.AttendChallengeReq;
+import ollie.wecare.challenge.dto.GetAttendanceRes;
 import ollie.wecare.challenge.dto.GetChallengesRes;
 import ollie.wecare.challenge.dto.PostChallengeReq;
 import ollie.wecare.challenge.entity.Challenge;
@@ -10,14 +11,18 @@ import ollie.wecare.challenge.repository.ChallengeAttendanceRepository;
 import ollie.wecare.challenge.repository.ChallengeRepository;
 import ollie.wecare.common.base.BaseException;
 import ollie.wecare.user.repository.UserRepository;
+import ollie.wecare.user.service.AuthService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ollie.wecare.common.base.BaseResponseStatus.*;
 
@@ -28,6 +33,8 @@ public class ChallengeService {
     private final ChallengeAttendanceRepository challengeAttendanceRepository;
     private final UserRepository userRepository;
     private final ChallengeRepository challengeRepository;
+
+    private final AuthService authService;
 
     public List<GetChallengesRes> getMyChallenges() throws BaseException {
         Long tmpUserIdx = 1L;
@@ -44,15 +51,12 @@ public class ChallengeService {
 
     //@Transactional
     public void attendChallenge(AttendChallengeReq attendChallengeReq) throws BaseException {
-        //TODO : userIdx 처리
-        Long tmpUserIdx = 1L;
-
         Challenge challenge = challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX));
         if(!challenge.getAttendanceCode().equals(attendChallengeReq.getAttendanceCode()))
             throw new BaseException(INVALID_ATTENDANCE_CODE);
         else {
             ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                    .user(userRepository.findById(tmpUserIdx).orElseThrow(()->new BaseException(INVALID_USER_IDX)))
+                    .user(userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_USER_IDX)))
                     .challenge(challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
                     .attendanceDate(LocalDateTime.now()).build();
             challengeAttendanceRepository.save(challengeAttendance);
@@ -61,9 +65,8 @@ public class ChallengeService {
 
     @Transactional
     public void participateChallenge(PostChallengeReq postChallengeReq) throws BaseException {
-        //TODO : USERidx 처리
         ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                .user(userRepository.findById(2L).orElseThrow(()->new BaseException(INVALID_USER_IDX)))
+                .user(userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_USER_IDX)))
                 .challenge(challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
                 .attendanceDate(LocalDateTime.now()).build();
         challengeAttendanceRepository.save(challengeAttendance);
@@ -72,6 +75,19 @@ public class ChallengeService {
 
     public List<GetChallengesRes> getChallenges(String searchWord) {
         return challengeRepository.findByNameContaining(searchWord).stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, 0L)).toList();
+    }
+
+    public List<GetAttendanceRes> getAttendance(Long challengeIdx, int year, int month) {
+        LocalDateTime firstDay = LocalDate.of(year, month, 1).atStartOfDay();
+        LocalDateTime lastDay = LocalDate.of(year, month, 1).atStartOfDay();
+        if(year == 0) {
+            firstDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atDay(1).atStartOfDay();
+            lastDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atEndOfMonth().atStartOfDay();
+        }
+        return challengeAttendanceRepository.findByChallenge_ChallengeIdxAndAttendanceDateBetween(challengeIdx, firstDay, lastDay)
+                .stream()
+                .map(challengeAttendance -> GetAttendanceRes.builder().attendanceDate(challengeAttendance.getAttendanceDate().toLocalDate()).build())
+                .collect(Collectors.toList());
     }
 
 
