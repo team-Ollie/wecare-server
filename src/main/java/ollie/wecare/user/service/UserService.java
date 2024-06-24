@@ -36,9 +36,10 @@ public class UserService {
     // 회원가입
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse<JwtDto> signup(SignupRequest signupRequest) {
-        Center center = centerRepository.findByCenterIdxAndStatusEquals(signupRequest.centerIdx(), ACTIVE).orElseThrow(() -> new BaseException(INVALID_CENTER_IDX));
-
+        if(userRepository.existsByLoginId(signupRequest.loginId())) throw new BaseException(DUPLICATED_LOGIN_ID);
         if(!isValidIdentifier(signupRequest.identifier())) throw new BaseException(INVALID_IDENTIFIER);
+
+        Center center = centerRepository.findByCenterIdxAndStatusEquals(signupRequest.centerIdx(), ACTIVE).orElseThrow(() -> new BaseException(INVALID_CENTER_IDX));
         User newUser = createUser(signupRequest, center);
         userRepository.save(newUser);
 
