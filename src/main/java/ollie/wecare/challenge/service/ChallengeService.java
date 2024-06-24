@@ -1,6 +1,7 @@
 package ollie.wecare.challenge.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ollie.wecare.challenge.dto.*;
 import ollie.wecare.challenge.entity.Challenge;
 import ollie.wecare.challenge.entity.ChallengeAttendance;
@@ -9,8 +10,10 @@ import ollie.wecare.challenge.repository.ChallengeRepository;
 import ollie.wecare.common.base.BaseException;
 import ollie.wecare.user.repository.UserRepository;
 import ollie.wecare.user.service.AuthService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +25,7 @@ import static ollie.wecare.common.base.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChallengeService {
 
     private final ChallengeAttendanceRepository challengeAttendanceRepository;
@@ -106,14 +110,15 @@ public class ChallengeService {
     * */
     public GetChallengeAdsRes getChallengeAds() {
 
-        Challenge mostParticipatedChallenge = challengeRepository.findById(1L).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX));
-        Challenge mostAttendancedChallenge = challengeRepository.findById(1L).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX));
-        Challenge mostRecentlyStartedChallenge = challengeRepository.findById(1L).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX));
+        Challenge mostAttendancedChallenge = challengeRepository.findTop1ByOrderByAttendanceRateDesc().orElseThrow(()-> new BaseException(NO_CHALLENGE));
+        Challenge mostParticipatedChallenge = challengeRepository.findMostParticipatedChallenge(PageRequest.of(0, 1)).getContent().get(0);
+        Challenge mostRecentlyStartedChallenge = challengeRepository.findTop1ByOrderByCreatedDateDesc().orElseThrow(()-> new BaseException(NO_CHALLENGE));
+
 
         return GetChallengeAdsRes.builder()
-                .mostAttendancedChallenge(mostAttendancedChallenge)
-                .mostParticipatedChallenge(mostParticipatedChallenge)
-                .mostRecentlyStartedChallenge(mostRecentlyStartedChallenge).build();
+                .mostAttendancedChallenge(GetChallengesRes.fromChallenge(mostAttendancedChallenge, 0L))
+                .mostParticipatedChallenge(GetChallengesRes.fromChallenge(mostParticipatedChallenge, 0L))
+                .mostRecentlyStartedChallenge(GetChallengesRes.fromChallenge(mostRecentlyStartedChallenge, 0L)).build();
 
     }
 
