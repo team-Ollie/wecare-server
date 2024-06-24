@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import static ollie.wecare.common.base.BaseResponseStatus.*;
 import static ollie.wecare.common.constants.Constants.ACTIVE;
+import static ollie.wecare.common.enums.Role.Admin;
 
 @Service
 @RequiredArgsConstructor
@@ -163,7 +164,7 @@ public class UserService {
     public BaseResponse<MyPageResponse> getMyPage(Long userIdx) {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
-        MyPageResponse myPageResponse = new MyPageResponse(user.getNickname(), user.getLevel());
+        MyPageResponse myPageResponse = new MyPageResponse(user.getNickname(), user.getLevel(), user.getRole().equals(Admin), user.getLoginId());
         return new BaseResponse<>(myPageResponse);
     }
 
