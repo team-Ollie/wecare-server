@@ -39,6 +39,7 @@ public enum BaseResponseStatus {
     // challenge
     INVALID_ATTENDANCE_CODE(false, HttpStatus.BAD_REQUEST, "잘못된 인증번호입니다."),
     INVALID_CHALLENGE_IDX(false, HttpStatus.NOT_FOUND, "잘못된 ChallengeIdx 입니다."),
+    NO_CHALLENGE(false, HttpStatus.NOT_FOUND, "Challenge 가 존재하지 않습니다."),
 
     /**
      * Response 오류
