@@ -21,7 +21,7 @@ public enum BaseResponseStatus {
     NO_MATCH_USER(false, HttpStatus.NOT_FOUND, "아이디에 맞는 user가 없습니다."),
     DUPLICATED_NICKNAME(false, HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다."),
     DUPLICATED_LOGIN_ID(false, HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
-    INVALID_NICKNAME(false, HttpStatus.BAD_REQUEST, "잘못된 닉네임 형식입니다."),
+    INVALID_NICKNAME(false, HttpStatus.BAD_REQUEST, "닉네임은 최대 8글자로 영어(대소문자 구분), 한글, 숫자, 띄어쓰기만 가능합니다."),
     INVALID_PASSWORD(false, HttpStatus.BAD_REQUEST, "잘못된 비밀번호 형식입니다."),
     INVALID_ROLE(false, HttpStatus.FORBIDDEN, "허용되지 않은 권한입니다."),
 
