@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static ollie.wecare.common.base.BaseResponseStatus.SUCCESS;
+import static ollie.wecare.common.constants.RequestURI.challenge;
 
 @RestController
-@RequestMapping("/challenges")
+@RequestMapping(challenge)
 @RequiredArgsConstructor
 public class ChallengeController {
 

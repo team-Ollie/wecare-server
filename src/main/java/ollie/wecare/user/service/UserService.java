@@ -71,15 +71,16 @@ public class UserService {
 
     // 로그인
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<JwtDto> login(LoginRequest loginRequest) {
+    public BaseResponse<LoginResponse> login(LoginRequest loginRequest) {
         User user = userRepository.findByLoginId(loginRequest.loginId()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         if(!encoder.matches(loginRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
 
         JwtDto jwtDto = authService.generateToken(user.getUserIdx());
+        LoginResponse loginResponse = new LoginResponse(jwtDto.accessToken(), jwtDto.refreshToken(), user.getRole().equals(Admin));
 
         user.login();
         userRepository.save(user);
-        return new BaseResponse<>(jwtDto);
+        return new BaseResponse<>(loginResponse);
     }
 
     // 로그아웃

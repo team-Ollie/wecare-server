@@ -19,7 +19,7 @@ public class GetProgramRes {
 
     private String name;
 
-    private LocalDateTime dueDate;
+    private DateDto dueDate;
 
     private String location;
 
@@ -33,12 +33,18 @@ public class GetProgramRes {
         return GetProgramRes.builder()
                 .programIdx(program.getProgramIdx())
                 .name(program.getName())
-                .dueDate(program.getDueDate())
+                .dueDate(convertToDateDto(program.getDueDate()))
                 .location(program.getLocation())
                 .host(program.getHost())
                 .schedule(program.getSchedule())
                 .description(program.getDescription()).build();
-
     }
 
+    private static DateDto convertToDateDto(LocalDateTime dueDate) {
+        if (dueDate == null) return null;
+        return new DateDto(
+                dueDate.getYear(),
+                dueDate.getMonthValue(),
+                dueDate.getDayOfMonth());
+    }
 }
