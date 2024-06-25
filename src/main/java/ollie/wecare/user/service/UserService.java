@@ -38,6 +38,7 @@ public class UserService {
     public BaseResponse<JwtDto> signup(SignupRequest signupRequest) {
         if(userRepository.existsByLoginId(signupRequest.loginId())) throw new BaseException(DUPLICATED_LOGIN_ID);
         if(!isValidIdentifier(signupRequest.identifier())) throw new BaseException(INVALID_IDENTIFIER);
+        if (!isValidNickname(signupRequest.nickname())) throw new BaseException(INVALID_NICKNAME);
 
         Center center = centerRepository.findByCenterIdxAndStatusEquals(signupRequest.centerIdx(), ACTIVE).orElseThrow(() -> new BaseException(INVALID_CENTER_IDX));
         User newUser = createUser(signupRequest, center);
@@ -62,11 +63,18 @@ public class UserService {
     private static boolean isValidIdentifier(String identifier) {
         String pattern = "^[가-힣]{2,7}\\d{4}$";
 
-        // 정규식 검사
         Pattern regex = Pattern.compile(pattern);
         Matcher matcher = regex.matcher(identifier);
 
         return matcher.matches();
+    }
+
+    // nickname 유효성 검사
+    private static boolean isValidNickname(String nickname) {
+        if (nickname.length() > 8) return false;
+
+        String regex = "^[가-힣a-zA-Z0-9\\s]*$";
+        return nickname.matches(regex);
     }
 
     // 로그인
@@ -129,6 +137,7 @@ public class UserService {
     // 닉네임 중복 체크
     public BaseResponse<String> validateNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) throw new BaseException(DUPLICATED_NICKNAME);
+        if (!isValidNickname(nickname)) throw new BaseException(INVALID_NICKNAME);
         return new BaseResponse<>(SUCCESS);
     }
 
