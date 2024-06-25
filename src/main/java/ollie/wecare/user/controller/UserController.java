@@ -24,7 +24,7 @@ public class UserController {
 
     // 로그인
     @PostMapping("/login")
-    public BaseResponse<JwtDto> login(@RequestBody LoginRequest loginRequest) {
+    public BaseResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
         return userService.login(loginRequest);
     }
 
