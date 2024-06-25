@@ -17,6 +17,7 @@ import static ollie.wecare.common.base.BaseResponseStatus.SUCCESS;
 @RequiredArgsConstructor
 public class ProgramController {
     private final ProgramService programService;
+
     /*
      * 프로그램 조회 (월별)
      * */
@@ -24,7 +25,7 @@ public class ProgramController {
     @GetMapping
     @ResponseBody
     public BaseResponse<List<GetProgramRes>> getPrograms(@RequestParam(value = "year", defaultValue = "0", required = false) Long year,
-                                                         @RequestParam(value = "year", defaultValue = "0", required = false) Long month) {
+                                                         @RequestParam(value = "month", defaultValue = "0", required = false) Long month) {
         return new BaseResponse<>(programService.getPrograms(year, month));
     }
 
