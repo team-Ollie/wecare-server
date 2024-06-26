@@ -5,6 +5,7 @@ import ollie.wecare.challenge.entity.Challenge;
 import ollie.wecare.challenge.repository.ChallengeRepository;
 import ollie.wecare.common.base.BaseException;
 import ollie.wecare.common.enums.Role;
+import ollie.wecare.program.dto.GetProgramDetailRes;
 import ollie.wecare.program.dto.GetProgramRes;
 import ollie.wecare.program.dto.PostProgramReq;
 import ollie.wecare.program.entity.Program;
@@ -20,8 +21,7 @@ import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
-import static ollie.wecare.common.base.BaseResponseStatus.INVALID_ROLE;
-import static ollie.wecare.common.base.BaseResponseStatus.INVALID_USER_IDX;
+import static ollie.wecare.common.base.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +43,11 @@ public class ProgramService {
         return programRepository.findByDueDateBetween(firstDay, lastDay).stream()
                 .map(GetProgramRes::fromProgram)
                 .toList();
+    }
+
+    public GetProgramDetailRes getProgram(Long programIdx) {
+        return GetProgramDetailRes.fromProgram(
+                programRepository.findById(programIdx).orElseThrow(()-> new BaseException(INVALID_PROGRAM_IDX)));
     }
 
     public void saveProgram(PostProgramReq postProgramReq) {

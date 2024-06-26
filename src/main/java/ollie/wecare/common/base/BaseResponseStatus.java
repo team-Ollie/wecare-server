@@ -35,6 +35,7 @@ public enum BaseResponseStatus {
     ACCESS_DENIED(false, HttpStatus.BAD_REQUEST, "접근 권한이 없습니다."),
 
     // program
+    INVALID_PROGRAM_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 ProgramIdx 입니다."),
 
     // challenge
     INVALID_ATTENDANCE_CODE(false, HttpStatus.BAD_REQUEST, "잘못된 인증번호입니다."),
