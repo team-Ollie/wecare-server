@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface ChallengeAttendanceRepository extends JpaRepository<ChallengeAttendance, Long> {
    List<ChallengeAttendance> findByUser_UserIdx(Long userIdx);
-   List<ChallengeAttendance> findByChallenge_ChallengeIdxAndAttendanceDateBetween(Long challengeIdx, LocalDateTime start, LocalDateTime last);
+   List<ChallengeAttendance> findByUser_UserIdxAndChallenge_ChallengeIdxAndAttendanceDateBetween(Long userIdx, Long challengeIdx, LocalDateTime start, LocalDateTime last);
 }
