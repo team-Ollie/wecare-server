@@ -2,6 +2,7 @@ package ollie.wecare.challenge.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ollie.wecare.challenge.dto.*;
 import ollie.wecare.challenge.service.ChallengeService;
 import ollie.wecare.common.base.BaseException;
@@ -16,6 +17,7 @@ import static ollie.wecare.common.constants.RequestURI.challenge;
 @RestController
 @RequestMapping(challenge)
 @RequiredArgsConstructor
+@Slf4j
 public class ChallengeController {
 
     private final ChallengeService challengeService;
@@ -66,7 +68,7 @@ public class ChallengeController {
     * */
     @GetMapping("/search")
     @ResponseBody
-    public BaseResponse<List<GetChallengesRes>> getChallenges(@RequestParam(value = "searhWord", defaultValue = "", required = false) String searchWord)throws BaseException {
+    public BaseResponse<List<GetChallengesRes>> getChallenges(@RequestParam(value = "searchWord", defaultValue = "", required = false) String searchWord)throws BaseException {
         return new BaseResponse<>(challengeService.getChallenges(searchWord));
     }
 
