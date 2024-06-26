@@ -3,6 +3,7 @@ package ollie.wecare.program.controller;
 import lombok.RequiredArgsConstructor;
 import ollie.wecare.common.base.BaseException;
 import ollie.wecare.common.base.BaseResponse;
+import ollie.wecare.program.dto.GetProgramDetailRes;
 import ollie.wecare.program.dto.GetProgramRes;
 import ollie.wecare.program.dto.PostProgramReq;
 import ollie.wecare.program.service.ProgramService;
@@ -28,6 +29,12 @@ public class ProgramController {
     public BaseResponse<List<GetProgramRes>> getPrograms(@RequestParam(value = "year", defaultValue = "0", required = false) Long year,
                                                          @RequestParam(value = "month", defaultValue = "0", required = false) Long month) {
         return new BaseResponse<>(programService.getPrograms(year, month));
+    }
+
+    @GetMapping("/{programIdx}")
+    @ResponseBody
+    public BaseResponse<GetProgramDetailRes> getProgram(@PathVariable(value = "programIdx") Long programIdx) {
+        return new BaseResponse<>(programService.getProgram(programIdx));
     }
 
     /*

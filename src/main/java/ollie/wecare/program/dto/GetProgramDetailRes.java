@@ -1,6 +1,5 @@
 package ollie.wecare.program.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class GetProgramRes {
+public class GetProgramDetailRes {
+
 
     private Long programIdx;
 
@@ -23,12 +23,25 @@ public class GetProgramRes {
 
     private DateDto dueDate;
 
-    public static GetProgramRes fromProgram(Program program) {
-        return GetProgramRes.builder()
+    private String location;
+
+    private String host;
+
+    private String schedule;
+
+    private String description;
+
+
+    public static GetProgramDetailRes fromProgram(Program program) {
+        return GetProgramDetailRes.builder()
                 .programIdx(program.getProgramIdx())
                 .name(program.getName())
                 .openDate(convertToDateDto(program.getOpenDate()))
-                .dueDate(convertToDateDto(program.getDueDate())).build();
+                .dueDate(convertToDateDto(program.getDueDate()))
+                .location(program.getLocation())
+                .host(program.getHost())
+                .schedule(program.getSchedule())
+                .description(program.getDescription()).build();
     }
 
     private static DateDto convertToDateDto(LocalDateTime dueDate) {
