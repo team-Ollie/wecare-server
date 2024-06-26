@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -91,17 +92,25 @@ public class ChallengeService {
      * 챌린지 참여 현황 조회(월별)
      * */
     public List<GetAttendanceRes> getAttendance(Long challengeIdx, Long year, Long month) {
-        int y = year.intValue();
+        Long userIdx = authService.getUserIdx();
+        if(userIdx == null) throw new BaseException(INVALID_USER_IDX);
+        int y = year != null && year > 0 ? year.intValue() : LocalDateTime.now().getYear();
+        int m = month != null && month > 0 ? month.intValue() : LocalDateTime.now().getMonthValue();
+
+        LocalDateTime firstDay = LocalDate.of(y, m, 1).atStartOfDay();
+        LocalDateTime lastDay = firstDay.with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
+
+        /*int y = year.intValue();
         int m = month.intValue();
         LocalDateTime firstDay = LocalDate.of(y, m, 1).atStartOfDay();
         LocalDateTime lastDay = LocalDate.of(y, m, 1).atStartOfDay();
         if(year == 0) {
             firstDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atDay(1).atStartOfDay();
             lastDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atEndOfMonth().atStartOfDay();
-        }
-        return challengeAttendanceRepository.findByChallenge_ChallengeIdxAndAttendanceDateBetween(challengeIdx, firstDay, lastDay)
+        }*/
+        return challengeAttendanceRepository.findByUser_UserIdxAndChallenge_ChallengeIdxAndAttendanceDateBetween(userIdx, challengeIdx, firstDay, lastDay)
                 .stream()
-                .map(challengeAttendance -> GetAttendanceRes.builder().attendanceDate(challengeAttendance.getAttendanceDate().toLocalDate()).build())
+                .map(challengeAttendance -> GetAttendanceRes.fromAttendance(challengeAttendance))
                 .collect(Collectors.toList());
     }
 
