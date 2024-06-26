@@ -12,5 +12,20 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 public class GetAttendanceRes {
-    private LocalDate attendanceDate;
+    private DateDto attendanceDate;
+
+    private static GetAttendanceRes fromAttendance(ChallengeAttendance attendance) {
+        return GetAttendanceRes.builder().
+            attendanceDate(convertToDateDto(attendance.getAttendanceDate()));
+    }
+
+    private static DateDto convertToDateDto(LocalDateTime dueDate) {
+        if (dueDate == null) return null;
+        return new DateDto(
+                dueDate.getYear(),
+                dueDate.getMonthValue(),
+                dueDate.getDayOfMonth());
+    }
+
+    
 }
