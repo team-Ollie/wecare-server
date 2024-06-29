@@ -33,6 +33,8 @@ public enum BaseResponseStatus {
     UNSUPPORTED_JWT_TOKEN(false, HttpStatus.BAD_REQUEST, "지원하지 않는 JWT 토큰 형식입니다."),
     EMPTY_JWT_CLAIM(false, HttpStatus.BAD_REQUEST, "JWT claims string이 비었습니다."),
     ACCESS_DENIED(false, HttpStatus.BAD_REQUEST, "접근 권한이 없습니다."),
+    NULL_ACCESS_TOKEN(false, HttpStatus.BAD_REQUEST, "Access token이 비었습니다."),
+
 
     // program
     INVALID_PROGRAM_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 ProgramIdx 입니다."),
