@@ -2,6 +2,7 @@ package ollie.wecare.challenge.repository;
 
 
 import ollie.wecare.challenge.entity.Challenge;
+import ollie.wecare.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +15,7 @@ import java.util.Optional;
 
 @Repository
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
-    List<Challenge> findByNameContaining(String searchWord);
+    List<Challenge> findByNameContainingAndParticipantsNotContaining(String searchWord, User user);
     Optional<Challenge> findTop1ByOrderByAttendanceRateDesc();
     @Query(value = "select c " +
             "from Challenge c " +
