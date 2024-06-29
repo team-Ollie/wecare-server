@@ -27,6 +27,7 @@ import static ollie.wecare.common.base.BaseResponseStatus.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class ChallengeService {
 
     private final ChallengeAttendanceRepository challengeAttendanceRepository;
@@ -39,8 +40,10 @@ public class ChallengeService {
      * 참여 중인 챌린지 조회
      * */
     public List<GetChallengesRes> getMyChallenges() throws BaseException {
-        Long tmpUserIdx = 1L;
-        List<ChallengeAttendance> participationList = challengeAttendanceRepository.findByUser_UserIdx(tmpUserIdx);
+        //TODO : 특정 get 요청만 인증받지 않도록 변경
+        Long userIdx = authService.getUserIdx();
+        if(userIdx == null) throw new BaseException(INVALID_ACCESS_TOKEN);
+        List<ChallengeAttendance> participationList = challengeAttendanceRepository.findByUser_UserIdx(userIdx);
         Long participationNum = (long)participationList.size();
 
         Set<Challenge> challengeSet = new HashSet<>();
@@ -54,14 +57,13 @@ public class ChallengeService {
     /*
      * 챌린지 인증
      * */
-    //@Transactional
     public void attendChallenge(AttendChallengeReq attendChallengeReq) throws BaseException {
         Challenge challenge = challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX));
         if(!challenge.getAttendanceCode().equals(attendChallengeReq.getAttendanceCode()))
             throw new BaseException(INVALID_ATTENDANCE_CODE);
         else {
             ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                    .user(userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_USER_IDX)))
+                    .user(userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_ACCESS_TOKEN)))
                     .challenge(challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
                     .attendanceDate(LocalDateTime.now()).build();
             challengeAttendanceRepository.save(challengeAttendance);
@@ -74,18 +76,27 @@ public class ChallengeService {
     @Transactional
     public void participateChallenge(PostChallengeReq postChallengeReq) throws BaseException {
         ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                .user(userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_USER_IDX)))
+                .user(userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_ACCESS_TOKEN)))
                 .challenge(challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
                 .attendanceDate(LocalDateTime.now()).build();
         challengeAttendanceRepository.save(challengeAttendance);
-        //TODO : 이미 참여중인 챌린지 처리
     }
 
     /*
      * 챌린지 검색
      * */
     public List<GetChallengesRes> getChallenges(String searchWord) {
-        return challengeRepository.findByNameContaining(searchWord).stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, 0L)).toList();
+        Long userIdx = authService.getUserIdx();
+        if(userIdx == null) throw new BaseException(INVALID_ACCESS_TOKEN);
+        List<Challenge> challenges = challengeRepository.findByNameContaining(searchWord);
+        List<Challenge> challengeResult = new ArrayList<>();
+        for(Challenge challenge : challenges) {
+            List<ChallengeAttendance> challengeAttendances = challengeAttendanceRepository.findByUser_UserIdxAndChallenge_ChallengeIdx(userIdx, challenge.getChallengeIdx());
+            if(challengeAttendances == null || challengeAttendances.isEmpty())
+                challengeResult.add(challenge);
+        }
+
+        return challengeResult.stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, 0L)).toList();
     }
 
     /*
@@ -93,7 +104,7 @@ public class ChallengeService {
      * */
     public List<GetAttendanceRes> getAttendance(Long challengeIdx, Long year, Long month) {
         Long userIdx = authService.getUserIdx();
-        if(userIdx == null) throw new BaseException(INVALID_USER_IDX);
+        if(userIdx == null) throw new BaseException(INVALID_ACCESS_TOKEN);
         int y = year != null && year > 0 ? year.intValue() : LocalDateTime.now().getYear();
         int m = month != null && month > 0 ? month.intValue() : LocalDateTime.now().getMonthValue();
 
@@ -108,8 +119,9 @@ public class ChallengeService {
             firstDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atDay(1).atStartOfDay();
             lastDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atEndOfMonth().atStartOfDay();
         }*/
-        return challengeAttendanceRepository.findByUser_UserIdxAndChallenge_ChallengeIdxAndAttendanceDateBetween(userIdx, challengeIdx, firstDay, lastDay)
+        return challengeAttendanceRepository.findByUser_UserIdxAndChallenge_ChallengeIdxAndAttendanceDateBetweenOrderByAttendanceDate(userIdx, challengeIdx, firstDay, lastDay)
                 .stream()
+                .skip(1L)
                 .map(challengeAttendance -> GetAttendanceRes.fromAttendance(challengeAttendance))
                 .collect(Collectors.toList());
     }
