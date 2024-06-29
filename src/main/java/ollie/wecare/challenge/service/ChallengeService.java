@@ -8,6 +8,8 @@ import ollie.wecare.challenge.entity.ChallengeAttendance;
 import ollie.wecare.challenge.repository.ChallengeAttendanceRepository;
 import ollie.wecare.challenge.repository.ChallengeRepository;
 import ollie.wecare.common.base.BaseException;
+import ollie.wecare.common.enums.Role;
+import ollie.wecare.user.entity.User;
 import ollie.wecare.user.repository.UserRepository;
 import ollie.wecare.user.service.AuthService;
 import org.springframework.data.domain.PageRequest;
@@ -53,6 +55,24 @@ public class ChallengeService {
         List<Challenge> challengesList = new ArrayList<>(challengeSet);
         return challengesList.stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, participationNum)).toList();
     }
+
+    /*
+     * 챌린지 인증코드 발급
+     * */
+    public GetAttendanceCodeReq getAttendanceCode(Long challengeIdx) {
+        User user = userRepository.findById(authService.getUserIdx()).orElseThrow(()-> new BaseException(INVALID_USER_IDX));
+        if(!user.getRole().equals(Role.Admin)) throw new BaseException(INVALID_ROLE);
+
+        Challenge challenge = challengeRepository.findById(challengeIdx).orElseThrow(() -> new BaseException(INVALID_CHALLENGE_IDX));
+
+        Random random = new Random();
+        String code = "";
+        for (int i=0; i<6; i++) code += Integer.toString(random.nextInt(9));
+
+        challenge.updateAttendanceCode(code);
+        return GetAttendanceCodeReq.builder().code(code).build();
+    }
+
 
     /*
      * 챌린지 인증
