@@ -19,6 +19,9 @@ import java.util.List;
 @AllArgsConstructor
 @DynamicInsert
 public class Challenge extends BaseEntity {
+    public void updateAttendanceCode(String attendanceCode) {
+        this.attendanceCode = attendanceCode;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
