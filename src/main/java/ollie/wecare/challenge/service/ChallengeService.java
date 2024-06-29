@@ -41,16 +41,12 @@ public class ChallengeService {
      * 참여 중인 챌린지 조회
      * */
     public List<GetChallengesRes> getMyChallenges() throws BaseException {
-        Long tmpUserIdx = 1L;
-        List<ChallengeAttendance> participationList = challengeAttendanceRepository.findByUser_UserIdx(tmpUserIdx);
-        Long participationNum = (long)participationList.size();
-
-        Set<Challenge> challengeSet = new HashSet<>();
-        for(ChallengeAttendance ca : participationList)
-            challengeSet.add(ca.getChallenge());
-
-        List<Challenge> challengesList = new ArrayList<>(challengeSet);
-        return challengesList.stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, participationNum)).toList();
+        //TODO : 공통 로직 수정
+        //TODO : 참여률 계산 수정
+        User user = userRepository.findById(authService.getUserIdx()).orElseThrow(()-> new BaseException(INVALID_ACCESS_TOKEN));
+        return challengeRepository.findByParticipantsContaining(user)
+                .stream()
+                .map(challenge -> GetChallengesRes.fromChallenge(challenge, 0L)).toList();
     }
 
     /*
@@ -74,11 +70,6 @@ public class ChallengeService {
      * */
     public void participateChallenge(PostChallengeReq postChallengeReq) throws BaseException {
         User user = userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_USER_IDX));
-        ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                .user(user)
-                .challenge(challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
-                .attendanceDate(LocalDateTime.now()).build();
-        challengeAttendanceRepository.save(challengeAttendance);
         Challenge challenge = challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(() -> new BaseException(INVALID_CHALLENGE_IDX));
         challenge.getParticipants().add(user);
         challengeRepository.save(challenge);
