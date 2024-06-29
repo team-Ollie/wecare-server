@@ -195,4 +195,11 @@ public class UserService {
             return user.orElse(null);
         }
     }
+
+    // 비회원 예외처리
+    private Long getUserIdxWithValidation() throws BaseException {
+        Long userIdx = authService.getUserIdx();
+        if (userIdx == null) throw new BaseException(NULL_ACCESS_TOKEN);
+        return userIdx;
+    }
 }
