@@ -32,8 +32,20 @@ public class ChallengeController {
     }
 
     /*
+    * 챌린지 인증코드 발급
+    * */
+    @PostMapping("/attendance/{challengeIdx}")
+    @ResponseBody
+    public BaseResponse<GetAttendanceCodeReq> getAttendanceCode(@PathVariable(value = "challengeIdx") Long challengeIdx) {
+        return new BaseResponse<>(challengeService.getAttendanceCode(challengeIdx));
+
+    }
+
+
+    /*
     * 챌린지 인증
     * */
+    //TODO : PathVariable로 변경
     @PostMapping("/attendance")
     @ResponseBody
     public BaseResponse<String> attendChallenge(@RequestBody AttendChallengeReq attendChallengeReq) throws BaseException {
