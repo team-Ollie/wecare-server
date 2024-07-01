@@ -22,6 +22,9 @@ public class Challenge extends BaseEntity {
     public void updateAttendanceCode(String attendanceCode) {
         this.attendanceCode = attendanceCode;
     }
+    public void updateAttendanceRate(Integer attendanceRate) {
+        this.attendanceRate = attendanceRate;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

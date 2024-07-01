@@ -21,6 +21,7 @@ import ollie.wecare.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -81,7 +82,9 @@ public class ProgramService {
     }
 
     public Challenge saveChallenge(Program program, User user) {
+        Duration duration = Duration.between(program.getOpenDate(), program.getDueDate());
+        Integer totalNum = Math.toIntExact(duration.toDays() / 7);//TODO : 특정 요일 횟수 반영
         return challengeRepository.save(Challenge.builder().program(program).name(program.getName()).attendanceRate(0)
-                .admin(user).host(program.getHost()).totalNum(10).build());
+                .admin(user).host(program.getHost()).totalNum(totalNum).build());
     }
 }
