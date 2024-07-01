@@ -14,6 +14,7 @@ import ollie.wecare.program.dto.DateDto;
 import ollie.wecare.user.entity.User;
 import ollie.wecare.user.repository.UserRepository;
 import ollie.wecare.user.service.UserService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,14 +40,10 @@ public class ChallengeService {
     // 참여중인 챌린지 목록 조회
     public BaseResponse<List<GetChallengesRes>> getMyChallenges(Long userIdx) throws BaseException {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-
-        List<ChallengeAttendance> attendances = challengeAttendanceRepository.findByUserAndStatusEquals(user, ACTIVE);
-        List<Challenge> challenges = attendances.stream()
-                .map(ChallengeAttendance::getChallenge)
+        return new BaseResponse<>(challengeRepository.findByParticipantsContaining(user).stream()
+                .map(challenge -> GetChallengesRes.fromChallenge(challenge, calculateMyAchievementRate(user, challenge)))
                 .distinct()
-                .toList();
-        List<GetChallengesRes> challengeList = challenges.stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, calculateMyAchievementRate(user, challenge))).toList();
-        return new BaseResponse<>(challengeList);
+                .toList());
     }
 
     /*
@@ -86,13 +83,9 @@ public class ChallengeService {
     /*
      * 새로운 챌린지 참여
      * */
-    @Transactional
     public void participateChallenge(PostChallengeReq postChallengeReq) throws BaseException {
-        ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                .user(userService.getUserWithValidation())
-                .challenge(challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
-                .build();
-        challengeAttendanceRepository.save(challengeAttendance);
+        Challenge challenge = challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX));
+        challenge.setParticipants(userService.getUserWithValidation());
     }
 
     /*
@@ -145,20 +138,20 @@ public class ChallengeService {
         else return (attendanceCount/challenge.getTotalNum()) * 100;
     }
 
-//    /*
-//    * 챌린지 배너 조회 (홈화면)
-//    * */
-//    public GetChallengeAdsRes getChallengeAds() {
-//
-//        Challenge mostAttendancedChallenge = challengeRepository.findTop1ByOrderByAttendanceRateDesc().orElseThrow(()-> new BaseException(NO_CHALLENGE));
-//        Challenge mostParticipatedChallenge = challengeRepository.findMostParticipatedChallenge(PageRequest.of(0, 1)).getContent().get(0);
-//        Challenge mostRecentlyStartedChallenge = challengeRepository.findTop1ByOrderByCreatedDateDesc().orElseThrow(()-> new BaseException(NO_CHALLENGE));
-//
-//
-//        return GetChallengeAdsRes.builder()
-//                .mostAttendancedChallenge(GetChallengesRes.fromChallenge(mostAttendancedChallenge, 0L))
-//                .mostParticipatedChallenge(GetChallengesRes.fromChallenge(mostParticipatedChallenge, 0L))
-//                .mostRecentlyStartedChallenge(GetChallengesRes.fromChallenge(mostRecentlyStartedChallenge, 0L)).build();
-//
-//    }
+    /*
+    * 챌린지 배너 조회 (홈화면)
+    * */
+    public GetChallengeAdsRes getChallengeAds() {
+
+        Challenge mostAttendancedChallenge = challengeRepository.findTop1ByOrderByAttendanceRateDesc().orElseThrow(()-> new BaseException(NO_CHALLENGE));
+        Challenge mostParticipatedChallenge = challengeRepository.findMostParticipatedChallenge(PageRequest.of(0, 1)).getContent().get(0);
+        Challenge mostRecentlyStartedChallenge = challengeRepository.findTop1ByOrderByCreatedDateDesc().orElseThrow(()-> new BaseException(NO_CHALLENGE));
+
+
+        return GetChallengeAdsRes.builder()
+                .mostAttendancedChallenge(GetChallengeAdRes.fromChallenge(mostAttendancedChallenge))
+                .mostParticipatedChallenge(GetChallengeAdRes.fromChallenge(mostParticipatedChallenge))
+                .mostRecentlyStartedChallenge(GetChallengeAdRes.fromChallenge(mostRecentlyStartedChallenge)).build();
+
+    }
 }

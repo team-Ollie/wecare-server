@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GetChallengeAdsRes {
 
-    private GetChallengesRes mostParticipatedChallenge;
-    private GetChallengesRes mostAttendancedChallenge;
-    private GetChallengesRes mostRecentlyStartedChallenge;
+    private GetChallengeAdRes mostParticipatedChallenge;
+    private GetChallengeAdRes mostAttendancedChallenge;
+    private GetChallengeAdRes mostRecentlyStartedChallenge;
 
 }

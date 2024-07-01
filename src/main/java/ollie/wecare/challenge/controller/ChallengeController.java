@@ -64,9 +64,9 @@ public class ChallengeController {
         return new BaseResponse<>(challengeService.getChallenges(searchWord));
     }
 
-//    // 챌린지 광고 조회
-//    @GetMapping("/ads")
-//    public BaseResponse<GetChallengeAdsRes> getChallengeAds() {
-//        return new BaseResponse<>(challengeService.getChallengeAds());
-//    }
+    // 챌린지 광고 조회
+    @GetMapping("/ads")
+    public BaseResponse<GetChallengeAdsRes> getChallengeAds() {
+        return new BaseResponse<>(challengeService.getChallengeAds());
+    }
 }
