@@ -2,6 +2,7 @@ package ollie.wecare.challenge.repository;
 
 
 import ollie.wecare.challenge.entity.Challenge;
+import ollie.wecare.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,5 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
     Optional<Challenge> findTop1ByOrderByCreatedDateDesc();
     Optional<Challenge> findByChallengeIdxAndStatusEquals(Long challengeIdx, String status);
+    List<Challenge> findByParticipantsContaining(User user);
 }

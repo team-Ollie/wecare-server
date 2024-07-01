@@ -48,4 +48,8 @@ public class Challenge extends BaseEntity {
     private Integer totalNum;
 
     private Integer attendanceRate;
+
+    public void setParticipants(User user) {
+        if(user != null) this.participants.add(user);
+    }
 }
