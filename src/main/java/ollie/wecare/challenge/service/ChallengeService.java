@@ -67,6 +67,14 @@ public class ChallengeService {
 
     }
 
+    public BaseResponse<List<GetChallengeAdminRes>> getMyChallengeAdmin(Long userIdx, Long challengeIdx) {
+        Challenge challenge = challengeRepository.findById(challengeIdx).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX));
+        if(!challenge.getAdmin().getUserIdx().equals(userIdx)) throw new BaseException(INVALID_ROLE);
+        return new BaseResponse<>(challenge.getParticipants().stream().map(participant -> GetChallengeAdminRes
+                .fromParticipant(participant, challengeAttendanceRepository.countByUserAndChallenge(participant, challenge))).toList());
+
+    }
+
     /*
      * 챌린지 인증코드 발급
      * */

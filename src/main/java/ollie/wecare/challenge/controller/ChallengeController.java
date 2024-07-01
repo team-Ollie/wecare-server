@@ -36,6 +36,12 @@ public class ChallengeController {
         return challengeService.getMyChallengesAdmin(authService.getUserIdx());
     }
 
+    // [관리자] 챌린지 상세 조회
+    @GetMapping("/admin/{challengeIdx}")
+    public BaseResponse<List<GetChallengeAdminRes>> getMyChallengeAdmin(@PathVariable(value = "challengeIdx") Long challengeIdx) throws BaseException {
+        return challengeService.getMyChallengeAdmin(authService.getUserIdx(), challengeIdx);
+    }
+
     // 챌린지 인증코드 발급
     @PostMapping("/attendance/{challengeIdx}")
     public BaseResponse<GetAttendanceCodeReq> getAttendanceCode(@PathVariable(value = "challengeIdx") Long challengeIdx) {
