@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ollie.wecare.challenge.entity.Challenge;
+import ollie.wecare.common.enums.TagEnum;
+import ollie.wecare.program.entity.Program;
+import ollie.wecare.program.entity.Tag;
 
 @Data
 @AllArgsConstructor
@@ -32,10 +35,18 @@ public class GetChallengesRes {
                 .challengeIdx(challenge.getChallengeIdx())
                 .name(challenge.getName())
                 .participantsCount(challenge.getParticipants().size())
-                .location(challenge.getProgram().getLocation())
+                .location(getLocationTag(challenge.getProgram()) != null ? getLocationTag(challenge.getProgram()).getTagName() : null)
                 .schedule(challenge.getProgram().getSchedule())
                 .myAttendanceRate(myAttendanceRate)
                 .totalAttendanceRate(challenge.getAttendanceRate()).build();
+    }
+
+    private static TagEnum getLocationTag(Program program) {
+        return program.getTags().stream()
+                .map(Tag::getName)
+                .filter(tagEnum -> tagEnum.getParent() == TagEnum.LOCATION)
+                .findFirst()
+                .orElse(null);
     }
 
 }

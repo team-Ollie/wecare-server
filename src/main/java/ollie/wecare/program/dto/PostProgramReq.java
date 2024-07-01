@@ -27,7 +27,6 @@ public class PostProgramReq {
         return Program.builder().name(postProgramReq.getName())
                 .dueDate(convertToLocalDateTime(postProgramReq.getDueDate()))
                 .openDate(convertToLocalDateTime(postProgramReq.getOpenDate()))
-                .location((postProgramReq.getLocation()))
                 .host(postProgramReq.getHost())
                 .schedule(postProgramReq.getSchedule())
                 .description(postProgramReq.getDescription())
