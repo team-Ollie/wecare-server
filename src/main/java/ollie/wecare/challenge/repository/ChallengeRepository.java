@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Repository
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
-    List<Challenge> findByNameContaining(String searchWord);
+    List<Challenge> findByNameContainingAndParticipantsNotContaining(String searchWord, User user);
     Optional<Challenge> findTop1ByOrderByAttendanceRateDesc();
     @Query(value = "select c " +
             "from Challenge c " +

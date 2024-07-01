@@ -93,15 +93,9 @@ public class ChallengeService {
      * */
     public List<GetChallengesRes> getChallenges(String searchWord) {
         User user = userService.getUserWithValidation();
-        List<Challenge> challenges = challengeRepository.findByNameContaining(searchWord);
-        List<Challenge> challengeResult = new ArrayList<>();
-
-        for(Challenge challenge : challenges) {
-            List<ChallengeAttendance> challengeAttendances = challengeAttendanceRepository.findByUserAndChallenge_ChallengeIdx(user, challenge.getChallengeIdx());
-            if(challengeAttendances == null || challengeAttendances.isEmpty())
-                challengeResult.add(challenge);
-        }
-        return challengeResult.stream()
+        List<Challenge> challenges = challengeRepository.findByNameContainingAndParticipantsNotContaining(searchWord, user);
+        return challenges.stream()
+                .distinct()
                 .map(challenge -> GetChallengesRes.fromChallenge(challenge, 0))
                 .toList();
 
