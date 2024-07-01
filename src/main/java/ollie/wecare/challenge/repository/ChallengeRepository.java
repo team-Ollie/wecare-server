@@ -23,5 +23,5 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     Page<Challenge> findMostParticipatedChallenge(Pageable pageable);
 
     Optional<Challenge> findTop1ByOrderByCreatedDateDesc();
-
+    Optional<Challenge> findByChallengeIdxAndStatusEquals(Long challengeIdx, String status);
 }

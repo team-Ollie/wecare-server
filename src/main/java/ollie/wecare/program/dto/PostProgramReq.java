@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 public class PostProgramReq {
     private String name;
 
-    private LocalDateTime dueDate;
+    private DateDto dueDate;
+
+    private DateDto openDate;
 
     private String location;
 
@@ -19,17 +21,22 @@ public class PostProgramReq {
 
     private String description;
 
-    //private List<Tag> tags;
+    private String category;
 
     public static Program toProgram(PostProgramReq postProgramReq) {
         return Program.builder().name(postProgramReq.getName())
-                .dueDate(postProgramReq.getDueDate())
+                .dueDate(convertToLocalDateTime(postProgramReq.getDueDate()))
+                .openDate(convertToLocalDateTime(postProgramReq.getOpenDate()))
                 .location((postProgramReq.getLocation()))
                 .host(postProgramReq.getHost())
                 .schedule(postProgramReq.getSchedule())
                 .description(postProgramReq.getDescription())
-                /*.tags(postProgramReq.getTags())*/
                 .build();
+    }
+
+    private static LocalDateTime convertToLocalDateTime(DateDto dateDto) {
+        if(dateDto == null) return null;
+        return LocalDateTime.of(dateDto.year(), dateDto.month(), dateDto.day(), 0, 0, 0);
     }
 
 

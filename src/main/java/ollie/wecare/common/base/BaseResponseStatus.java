@@ -35,9 +35,9 @@ public enum BaseResponseStatus {
     ACCESS_DENIED(false, HttpStatus.BAD_REQUEST, "접근 권한이 없습니다."),
     NULL_ACCESS_TOKEN(false, HttpStatus.BAD_REQUEST, "Access token이 비었습니다."),
 
-
     // program
     INVALID_PROGRAM_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 ProgramIdx 입니다."),
+    NO_PARTICIPANT(false, HttpStatus.BAD_REQUEST, "해당 챌린지의 참여자가 아닙니다."),
 
     // challenge
     INVALID_ATTENDANCE_CODE(false, HttpStatus.BAD_REQUEST, "잘못된 인증번호입니다."),

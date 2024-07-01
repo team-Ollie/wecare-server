@@ -26,7 +26,7 @@ public record ProgramListResponse(Long programIdx,
                 program.getName(),
                 convertToDateDto(program.getOpenDate()),
                 convertToDateDto(program.getDueDate()),
-                program.getLocation(),
+                getLocationTag(program) != null ? getCategoryTag(program).getTagName() : null,
                 getCategoryTag(program) != null ? getCategoryTag(program).getTagName() : null);
     }
 
@@ -34,6 +34,14 @@ public record ProgramListResponse(Long programIdx,
         return program.getTags().stream()
                 .map(Tag::getName)
                 .filter(tagEnum -> tagEnum.getParent() == TagEnum.CATEGORY)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static TagEnum getLocationTag(Program program) {
+        return program.getTags().stream()
+                .map(Tag::getName)
+                .filter(tagEnum -> tagEnum.getParent() == TagEnum.LOCATION)
                 .findFirst()
                 .orElse(null);
     }
