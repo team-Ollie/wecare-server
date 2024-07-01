@@ -72,7 +72,7 @@ public class ChallengeController {
 
     // 챌린지 검색
     @GetMapping("/search")
-    public BaseResponse<List<GetChallengesRes>> getChallenges(@RequestParam(value = "searchWord", defaultValue = "", required = false) String searchWord)throws BaseException {
+    public BaseResponse<List<SearchChallengeRes>> getChallenges(@RequestParam(value = "searchWord", defaultValue = "", required = false) String searchWord)throws BaseException {
         return new BaseResponse<>(challengeService.getChallenges(searchWord));
     }
 

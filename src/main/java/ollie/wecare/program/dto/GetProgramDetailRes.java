@@ -27,6 +27,8 @@ public class GetProgramDetailRes {
 
     private String location;
 
+    private String locatedPlace;
+
     private String category;
 
     private String host;
@@ -42,6 +44,7 @@ public class GetProgramDetailRes {
                 .name(program.getName())
                 .openDate(convertToDateDto(program.getOpenDate()))
                 .dueDate(convertToDateDto(program.getDueDate()))
+                .locatedPlace(program.getLocatedPlace())
                 .location(getLocationTag(program) != null ? getLocationTag(program).getTagName() : null)
                 .category(getCategoryTag(program) != null ? getCategoryTag(program).getTagName() : null)
                 .host(program.getHost())

@@ -25,6 +25,8 @@ public class GetChallengesRes {
 
     private String schedule;
 
+    private String locatedPlace;
+
     private Integer myAttendanceRate;
 
     private Integer totalAttendanceRate;
@@ -38,6 +40,7 @@ public class GetChallengesRes {
                 .location(getLocationTag(challenge.getProgram()) != null ? getLocationTag(challenge.getProgram()).getTagName() : null)
                 .schedule(challenge.getProgram().getSchedule())
                 .myAttendanceRate(myAttendanceRate)
+                .locatedPlace(challenge.getProgram().getLocatedPlace())
                 .totalAttendanceRate(challenge.getAttendanceRate()).build();
     }
 
