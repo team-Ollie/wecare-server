@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import ollie.wecare.challenge.entity.Challenge;
 import ollie.wecare.challenge.repository.ChallengeRepository;
 import ollie.wecare.common.base.BaseException;
+import ollie.wecare.common.base.BaseResponse;
 import ollie.wecare.common.enums.Role;
 import ollie.wecare.program.dto.GetProgramDetailRes;
 import ollie.wecare.program.dto.GetProgramRes;
 import ollie.wecare.program.dto.PostProgramReq;
+import ollie.wecare.program.dto.ProgramListResponse;
 import ollie.wecare.program.entity.Program;
 import ollie.wecare.program.repository.ProgramRepository;
 import ollie.wecare.user.entity.User;
@@ -33,6 +35,7 @@ public class ProgramService {
 
     private final UserRepository userRepository;
 
+    // 프로그램 월별 조회
     public List<GetProgramRes> getPrograms(Long year, Long month) {
         int y = year != null && year > 0 ? year.intValue() : LocalDateTime.now().getYear();
         int m = month != null && month > 0 ? month.intValue() : LocalDateTime.now().getMonthValue();
@@ -45,6 +48,15 @@ public class ProgramService {
                 .toList();
     }
 
+    // 프로그램 전체 목록 조회
+    public BaseResponse<List<ProgramListResponse>> getProgramList() {
+        List<ProgramListResponse> programList = programRepository.findAll().stream()
+                .map(ProgramListResponse::fromProgram)
+                .toList();
+        return new BaseResponse<>(programList);
+    }
+
+    // 프로그램 상세 조회
     public GetProgramDetailRes getProgram(Long programIdx) {
         return GetProgramDetailRes.fromProgram(
                 programRepository.findById(programIdx).orElseThrow(()-> new BaseException(INVALID_PROGRAM_IDX)));
