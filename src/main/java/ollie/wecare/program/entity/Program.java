@@ -35,7 +35,7 @@ public class Program extends BaseEntity {
 
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "program")
     private List<Tag> tags;
 
     public void setTags(List<Tag> tags) {

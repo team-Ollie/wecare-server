@@ -39,10 +39,10 @@ public class ProgramController {
         return new BaseResponse<>(programService.getProgram(programIdx));
     }
 
-//    // 프로그램 등록
-//    @PostMapping
-//    public BaseResponse<String> saveProgram(@RequestBody PostProgramReq postProgramReq) throws BaseException {
-//        programService.saveProgram(postProgramReq);
-//        return new BaseResponse<>(SUCCESS);
-//    }
+    // 프로그램 등록
+    @PostMapping
+    public BaseResponse<String> saveProgram(@RequestBody PostProgramReq postProgramReq) throws BaseException {
+        programService.saveProgram(postProgramReq);
+        return new BaseResponse<>(SUCCESS);
+    }
 }
