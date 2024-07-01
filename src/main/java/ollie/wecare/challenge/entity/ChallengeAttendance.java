@@ -9,7 +9,6 @@ import ollie.wecare.common.base.BaseEntity;
 import ollie.wecare.user.entity.User;
 import org.hibernate.annotations.DynamicInsert;
 
-import java.time.LocalDateTime;
 @Entity
 @Getter
 @Builder
@@ -30,10 +29,4 @@ public class ChallengeAttendance extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_idx")
     private Challenge challenge;
-
-    //TODO : createdDate로 대체해서 사용하는 것 고려해보기
-    private LocalDateTime attendanceDate;
-
-
-
 }

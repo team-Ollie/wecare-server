@@ -62,18 +62,18 @@ public class ProgramService {
                 programRepository.findById(programIdx).orElseThrow(()-> new BaseException(INVALID_PROGRAM_IDX)));
     }
 
-    public void saveProgram(PostProgramReq postProgramReq) {
-        User user = userRepository.findById(authService.getUserIdx()).orElseThrow(()-> new BaseException(INVALID_USER_IDX));
-        if(!user.getRole().equals(Role.Admin)) throw new BaseException(INVALID_ROLE);
-
-        Program program = PostProgramReq.toProgram(postProgramReq);
-        programRepository.save(program);
-
-        this.saveChallenge(PostProgramReq.toProgram(postProgramReq), user);
-    }
-
-    public void saveChallenge(Program program, User user) {
-        challengeRepository.save(Challenge.builder().program(program).name(program.getName()).attendanceRate(0L)
-                .admin(user).host(program.getHost()).totalNum(0L).build());
-    }
+//    public void saveProgram(PostProgramReq postProgramReq) {
+//        User user = userRepository.findById(authService.getUserIdx()).orElseThrow(()-> new BaseException(INVALID_USER_IDX));
+//        if(!user.getRole().equals(Role.Admin)) throw new BaseException(INVALID_ROLE);
+//
+//        Program program = PostProgramReq.toProgram(postProgramReq);
+//        programRepository.save(program);
+//
+//        this.saveChallenge(PostProgramReq.toProgram(postProgramReq), user);
+//    }
+//
+//    public void saveChallenge(Program program, User user) {
+//        challengeRepository.save(Challenge.builder().program(program).name(program.getName()).attendanceRate(0L)
+//                .admin(user).host(program.getHost()).totalNum(0L).build());
+//    }
 }
