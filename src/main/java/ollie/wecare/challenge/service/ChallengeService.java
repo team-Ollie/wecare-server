@@ -39,14 +39,10 @@ public class ChallengeService {
     // 참여중인 챌린지 목록 조회
     public BaseResponse<List<GetChallengesRes>> getMyChallenges(Long userIdx) throws BaseException {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-
-        List<ChallengeAttendance> attendances = challengeAttendanceRepository.findByUserAndStatusEquals(user, ACTIVE);
-        List<Challenge> challenges = attendances.stream()
-                .map(ChallengeAttendance::getChallenge)
+        return new BaseResponse<>(challengeRepository.findByParticipantsContaining(user).stream()
+                .map(challenge -> GetChallengesRes.fromChallenge(challenge, calculateMyAchievementRate(user, challenge)))
                 .distinct()
-                .toList();
-        List<GetChallengesRes> challengeList = challenges.stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, calculateMyAchievementRate(user, challenge))).toList();
-        return new BaseResponse<>(challengeList);
+                .toList());
     }
 
     /*
@@ -86,13 +82,9 @@ public class ChallengeService {
     /*
      * 새로운 챌린지 참여
      * */
-    @Transactional
     public void participateChallenge(PostChallengeReq postChallengeReq) throws BaseException {
-        ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                .user(userService.getUserWithValidation())
-                .challenge(challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
-                .build();
-        challengeAttendanceRepository.save(challengeAttendance);
+        Challenge challenge = challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX));
+        challenge.setParticipants(userService.getUserWithValidation());
     }
 
     /*
