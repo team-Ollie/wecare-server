@@ -23,4 +23,9 @@ public class Tag extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "program_idx")
     private Program program;
+
+    public void setProgram(Program program) {
+        this.program = program;
+        if (program != null) { program.getTags().add(this); }
+    }
 }

@@ -1,10 +1,7 @@
 package ollie.wecare.program.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ollie.wecare.common.base.BaseEntity;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -41,4 +38,10 @@ public class Program extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY)
     private List<Tag> tags;
 
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+        for (Tag tag : this.tags) {
+            tag.setProgram(this);
+        }
+    }
 }
