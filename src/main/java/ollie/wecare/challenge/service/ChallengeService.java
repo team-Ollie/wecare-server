@@ -77,6 +77,9 @@ public class ChallengeService {
                     .challenge(challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
                     .build();
             challengeAttendanceRepository.save(challengeAttendance);
+            Integer newAttendanceRate = (int) ((challenge.getAttendanceRate()/(float)100 + (1/(float)((challenge.getTotalNum()) * challenge.getParticipants().size()))) * 100);
+            //log.info("attendanceRate : {}", newAttendanceRate);
+            challenge.updateAttendanceRate(newAttendanceRate);
         }
     }
 
@@ -93,15 +96,9 @@ public class ChallengeService {
      * */
     public List<GetChallengesRes> getChallenges(String searchWord) {
         User user = userService.getUserWithValidation();
-        List<Challenge> challenges = challengeRepository.findByNameContaining(searchWord);
-        List<Challenge> challengeResult = new ArrayList<>();
-
-        for(Challenge challenge : challenges) {
-            List<ChallengeAttendance> challengeAttendances = challengeAttendanceRepository.findByUserAndChallenge_ChallengeIdx(user, challenge.getChallengeIdx());
-            if(challengeAttendances == null || challengeAttendances.isEmpty())
-                challengeResult.add(challenge);
-        }
-        return challengeResult.stream()
+        List<Challenge> challenges = challengeRepository.findByNameContainingAndParticipantsNotContaining(searchWord, user);
+        return challenges.stream()
+                .distinct()
                 .map(challenge -> GetChallengesRes.fromChallenge(challenge, 0))
                 .toList();
 
@@ -134,8 +131,9 @@ public class ChallengeService {
     // 챌린지 개인 달성률 계산
     private Integer calculateMyAchievementRate(User user, Challenge challenge) {
         Integer attendanceCount = challengeAttendanceRepository.countByUserAndChallenge(user, challenge);
+        log.info("attendanceCount : {}", attendanceCount);
         if (attendanceCount == null) return 0;
-        else return (attendanceCount/challenge.getTotalNum()) * 100;
+        else return (int)((attendanceCount/(float)challenge.getTotalNum()) * 100);
     }
 
     /*
