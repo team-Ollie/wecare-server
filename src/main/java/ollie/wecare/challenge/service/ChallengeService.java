@@ -8,23 +8,21 @@ import ollie.wecare.challenge.entity.ChallengeAttendance;
 import ollie.wecare.challenge.repository.ChallengeAttendanceRepository;
 import ollie.wecare.challenge.repository.ChallengeRepository;
 import ollie.wecare.common.base.BaseException;
+import ollie.wecare.common.base.BaseResponse;
 import ollie.wecare.common.enums.Role;
+import ollie.wecare.program.dto.DateDto;
 import ollie.wecare.user.entity.User;
 import ollie.wecare.user.repository.UserRepository;
 import ollie.wecare.user.service.AuthService;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 import static ollie.wecare.common.base.BaseResponseStatus.*;
+import static ollie.wecare.common.constants.Constants.ACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -38,22 +36,17 @@ public class ChallengeService {
 
     private final AuthService authService;
 
-    /*
-     * 참여 중인 챌린지 조회
-     * */
-    public List<GetChallengesRes> getMyChallenges() throws BaseException {
-        //TODO : 특정 get 요청만 인증받지 않도록 변경
-        Long userIdx = authService.getUserIdx();
-        if(userIdx == null) throw new BaseException(INVALID_ACCESS_TOKEN);
-        List<ChallengeAttendance> participationList = challengeAttendanceRepository.findByUser_UserIdx(userIdx);
-        Long participationNum = (long)participationList.size();
+    // 참여중인 챌린지 목록 조회
+    public BaseResponse<List<GetChallengesRes>> getMyChallenges(Long userIdx) throws BaseException {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
-        Set<Challenge> challengeSet = new HashSet<>();
-        for(ChallengeAttendance ca : participationList)
-            challengeSet.add(ca.getChallenge());
-
-        List<Challenge> challengesList = new ArrayList<>(challengeSet);
-        return challengesList.stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, participationNum)).toList();
+        List<ChallengeAttendance> attendances = challengeAttendanceRepository.findByUserAndStatusEquals(user, ACTIVE);
+        List<Challenge> challenges = attendances.stream()
+                .map(ChallengeAttendance::getChallenge)
+                .distinct()
+                .toList();
+        List<GetChallengesRes> challengeList = challenges.stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, calculateMyAchievementRate(user, challenge))).toList();
+        return new BaseResponse<>(challengeList);
     }
 
     /*
@@ -73,7 +66,6 @@ public class ChallengeService {
         return GetAttendanceCodeReq.builder().code(code).build();
     }
 
-
     /*
      * 챌린지 인증
      * */
@@ -85,7 +77,7 @@ public class ChallengeService {
             ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
                     .user(userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_ACCESS_TOKEN)))
                     .challenge(challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
-                    .attendanceDate(LocalDateTime.now()).build();
+                    .build();
             challengeAttendanceRepository.save(challengeAttendance);
         }
     }
@@ -98,70 +90,72 @@ public class ChallengeService {
         ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
                 .user(userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_ACCESS_TOKEN)))
                 .challenge(challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
-                .attendanceDate(LocalDateTime.now()).build();
+                .build();
         challengeAttendanceRepository.save(challengeAttendance);
     }
 
-    /*
-     * 챌린지 검색
-     * */
-    public List<GetChallengesRes> getChallenges(String searchWord) {
-        Long userIdx = authService.getUserIdx();
-        if(userIdx == null) throw new BaseException(INVALID_ACCESS_TOKEN);
-        List<Challenge> challenges = challengeRepository.findByNameContaining(searchWord);
-        List<Challenge> challengeResult = new ArrayList<>();
-        for(Challenge challenge : challenges) {
-            List<ChallengeAttendance> challengeAttendances = challengeAttendanceRepository.findByUser_UserIdxAndChallenge_ChallengeIdx(userIdx, challenge.getChallengeIdx());
-            if(challengeAttendances == null || challengeAttendances.isEmpty())
-                challengeResult.add(challenge);
-        }
+//    /*
+//     * 챌린지 검색
+//     * */
+//    public List<GetChallengesRes> getChallenges(String searchWord) {
+//        Long userIdx = authService.getUserIdx();
+//        if(userIdx == null) throw new BaseException(INVALID_ACCESS_TOKEN);
+//        List<Challenge> challenges = challengeRepository.findByNameContaining(searchWord);
+//        List<Challenge> challengeResult = new ArrayList<>();
+//
+//        for(Challenge challenge : challenges) {
+//            List<ChallengeAttendance> challengeAttendances = challengeAttendanceRepository.findByUser_UserIdxAndChallenge_ChallengeIdx(userIdx, challenge.getChallengeIdx());
+//            if(challengeAttendances == null || challengeAttendances.isEmpty())
+//                challengeResult.add(challenge);
+//        }
+//        return challengeResult.stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, 0L).toList();
+//    }
 
-        return challengeResult.stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, 0L)).toList();
+    // 챌린지 상세 조회
+    public BaseResponse<ChallengeDetailResponse> getChallengeDetail(Long userIdx, Long challengeIdx) {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        Challenge challenge = challengeRepository.findByChallengeIdxAndStatusEquals(challengeIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_CHALLENGE_IDX));
+        if (!challenge.getParticipants().contains(user)) throw new BaseException(NO_PARTICIPANT);
+
+        List<DateDto> attendanceList = challengeAttendanceRepository.findByUserAndChallengeOrderByCreatedDate(user, challenge).stream()
+                .map(challengeAttendance -> convertToDateDto(challengeAttendance.getCreatedDate()))
+                .toList();
+
+        ChallengeDetailResponse challengeDetail = new ChallengeDetailResponse(challenge.getName(), challenge.getParticipants().size(),
+                attendanceList, challenge.getAttendanceRate(), calculateMyAchievementRate(user, challenge));
+        return new BaseResponse<>(challengeDetail);
     }
 
-    /*
-     * 챌린지 참여 현황 조회(월별)
-     * */
-    public List<GetAttendanceRes> getAttendance(Long challengeIdx, Long year, Long month) {
-        Long userIdx = authService.getUserIdx();
-        if(userIdx == null) throw new BaseException(INVALID_ACCESS_TOKEN);
-        int y = year != null && year > 0 ? year.intValue() : LocalDateTime.now().getYear();
-        int m = month != null && month > 0 ? month.intValue() : LocalDateTime.now().getMonthValue();
-
-        LocalDateTime firstDay = LocalDate.of(y, m, 1).atStartOfDay();
-        LocalDateTime lastDay = firstDay.with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
-
-        /*int y = year.intValue();
-        int m = month.intValue();
-        LocalDateTime firstDay = LocalDate.of(y, m, 1).atStartOfDay();
-        LocalDateTime lastDay = LocalDate.of(y, m, 1).atStartOfDay();
-        if(year == 0) {
-            firstDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atDay(1).atStartOfDay();
-            lastDay = YearMonth.from(LocalDateTime.now().toLocalDate()).atEndOfMonth().atStartOfDay();
-        }*/
-        return challengeAttendanceRepository.findByUser_UserIdxAndChallenge_ChallengeIdxAndAttendanceDateBetweenOrderByAttendanceDate(userIdx, challengeIdx, firstDay, lastDay)
-                .stream()
-                .skip(1L)
-                .map(challengeAttendance -> GetAttendanceRes.fromAttendance(challengeAttendance))
-                .collect(Collectors.toList());
+    // DateDto 형태 변환
+    private static DateDto convertToDateDto(LocalDateTime dateTime) {
+        if (dateTime == null) return null;
+        return new DateDto(
+                dateTime.getYear(),
+                dateTime.getMonthValue(),
+                dateTime.getDayOfMonth());
     }
 
-    /*
-    * 챌린지 배너 조회 (홈화면)
-    * */
-    public GetChallengeAdsRes getChallengeAds() {
-
-        Challenge mostAttendancedChallenge = challengeRepository.findTop1ByOrderByAttendanceRateDesc().orElseThrow(()-> new BaseException(NO_CHALLENGE));
-        Challenge mostParticipatedChallenge = challengeRepository.findMostParticipatedChallenge(PageRequest.of(0, 1)).getContent().get(0);
-        Challenge mostRecentlyStartedChallenge = challengeRepository.findTop1ByOrderByCreatedDateDesc().orElseThrow(()-> new BaseException(NO_CHALLENGE));
-
-
-        return GetChallengeAdsRes.builder()
-                .mostAttendancedChallenge(GetChallengesRes.fromChallenge(mostAttendancedChallenge, 0L))
-                .mostParticipatedChallenge(GetChallengesRes.fromChallenge(mostParticipatedChallenge, 0L))
-                .mostRecentlyStartedChallenge(GetChallengesRes.fromChallenge(mostRecentlyStartedChallenge, 0L)).build();
-
+    // 챌린지 개인 달성률 계산
+    private Integer calculateMyAchievementRate(User user, Challenge challenge) {
+        Integer attendanceCount = challengeAttendanceRepository.countByUserAndChallenge(user, challenge);
+        if (attendanceCount == null) return 0;
+        else return (attendanceCount/challenge.getTotalNum()) * 100;
     }
 
-
+//    /*
+//    * 챌린지 배너 조회 (홈화면)
+//    * */
+//    public GetChallengeAdsRes getChallengeAds() {
+//
+//        Challenge mostAttendancedChallenge = challengeRepository.findTop1ByOrderByAttendanceRateDesc().orElseThrow(()-> new BaseException(NO_CHALLENGE));
+//        Challenge mostParticipatedChallenge = challengeRepository.findMostParticipatedChallenge(PageRequest.of(0, 1)).getContent().get(0);
+//        Challenge mostRecentlyStartedChallenge = challengeRepository.findTop1ByOrderByCreatedDateDesc().orElseThrow(()-> new BaseException(NO_CHALLENGE));
+//
+//
+//        return GetChallengeAdsRes.builder()
+//                .mostAttendancedChallenge(GetChallengesRes.fromChallenge(mostAttendancedChallenge, 0L))
+//                .mostParticipatedChallenge(GetChallengesRes.fromChallenge(mostParticipatedChallenge, 0L))
+//                .mostRecentlyStartedChallenge(GetChallengesRes.fromChallenge(mostRecentlyStartedChallenge, 0L)).build();
+//
+//    }
 }
