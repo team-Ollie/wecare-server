@@ -16,27 +16,26 @@ public class GetChallengesRes {
 
     private String name;
 
-    private Long participantsNum;
+    private Integer participantsCount;
 
     private String location;
 
     private String schedule;
 
-    private Long attendanceRate;
+    private Integer myAttendanceRate;
 
-    private Long totalAttendanceRate;
+    private Integer totalAttendanceRate;
 
-    public static GetChallengesRes fromChallenge(Challenge challenge, Long userParticipationNum) {
+    public static GetChallengesRes fromChallenge(Challenge challenge, Integer myAttendanceRate) {
 
         return GetChallengesRes.builder()
                 .challengeIdx(challenge.getChallengeIdx())
                 .name(challenge.getName())
-                .participantsNum((long) challenge.getParticipants().size())
+                .participantsCount(challenge.getParticipants().size())
                 .location(challenge.getProgram().getLocation())
                 .schedule(challenge.getProgram().getSchedule())
-                .attendanceRate(Math.round((double)userParticipationNum/challenge.getTotalNum()) * 100)
+                .myAttendanceRate(myAttendanceRate)
                 .totalAttendanceRate(challenge.getAttendanceRate()).build();
-
     }
 
 }

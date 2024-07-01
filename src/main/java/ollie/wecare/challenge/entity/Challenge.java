@@ -45,9 +45,7 @@ public class Challenge extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY)
     private List<User> participants;
 
-    private Long totalNum;
+    private Integer totalNum;
 
-    private Long attendanceRate;
-
-
+    private Integer attendanceRate;
 }

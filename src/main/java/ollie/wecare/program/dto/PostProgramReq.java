@@ -19,7 +19,7 @@ public class PostProgramReq {
 
     private String description;
 
-    //private List<Tag> tags;
+    //private List<TagEnum> tags;
 
     public static Program toProgram(PostProgramReq postProgramReq) {
         return Program.builder().name(postProgramReq.getName())
