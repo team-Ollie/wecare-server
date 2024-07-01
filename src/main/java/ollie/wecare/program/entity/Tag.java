@@ -9,6 +9,8 @@ import org.hibernate.annotations.DynamicInsert;
 @Entity
 @Getter
 @DynamicInsert
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Tag extends BaseEntity {
 
@@ -20,9 +22,10 @@ public class Tag extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TagEnum name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "program_idx")
     private Program program;
+
 
     public void setProgram(Program program) {
         this.program = program;

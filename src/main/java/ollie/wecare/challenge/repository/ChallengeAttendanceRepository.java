@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface ChallengeAttendanceRepository extends JpaRepository<ChallengeAttendance, Long> {
    List<ChallengeAttendance> findByUser_UserIdx(Long userIdx);
-   List<ChallengeAttendance> findByUser_UserIdxAndChallenge_ChallengeIdx(Long userIdx, Long challengeIdx);
+   List<ChallengeAttendance> findByUserAndChallenge_ChallengeIdx(User user, Long challengeIdx);
    List<ChallengeAttendance> findByUserAndChallengeOrderByCreatedDate(User user, Challenge challenge);
    Integer countByUserAndChallenge(User user, Challenge challenge);
    List<ChallengeAttendance> findByUserAndStatusEquals(User user, String status);

@@ -58,11 +58,11 @@ public class ChallengeController {
         return new BaseResponse<>(SUCCESS);
     }
 
-//    // 챌린지 검색
-//    @GetMapping("/search")
-//    public BaseResponse<List<GetChallengesRes>> getChallenges(@RequestParam(value = "searchWord", defaultValue = "", required = false) String searchWord)throws BaseException {
-//        return new BaseResponse<>(challengeService.getChallenges(searchWord));
-//    }
+    // 챌린지 검색
+    @GetMapping("/search")
+    public BaseResponse<List<GetChallengesRes>> getChallenges(@RequestParam(value = "searchWord", defaultValue = "", required = false) String searchWord)throws BaseException {
+        return new BaseResponse<>(challengeService.getChallenges(searchWord));
+    }
 
 //    // 챌린지 광고 조회
 //    @GetMapping("/ads")

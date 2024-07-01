@@ -13,7 +13,7 @@ import ollie.wecare.common.enums.Role;
 import ollie.wecare.program.dto.DateDto;
 import ollie.wecare.user.entity.User;
 import ollie.wecare.user.repository.UserRepository;
-import ollie.wecare.user.service.AuthService;
+import ollie.wecare.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +34,7 @@ public class ChallengeService {
     private final UserRepository userRepository;
     private final ChallengeRepository challengeRepository;
 
-    private final AuthService authService;
+    private final UserService userService;
 
     // 참여중인 챌린지 목록 조회
     public BaseResponse<List<GetChallengesRes>> getMyChallenges(Long userIdx) throws BaseException {
@@ -53,7 +53,8 @@ public class ChallengeService {
      * 챌린지 인증코드 발급
      * */
     public GetAttendanceCodeReq getAttendanceCode(Long challengeIdx) {
-        User user = userRepository.findById(authService.getUserIdx()).orElseThrow(()-> new BaseException(INVALID_USER_IDX));
+
+        User user = userService.getUserWithValidation();
         if(!user.getRole().equals(Role.Admin)) throw new BaseException(INVALID_ROLE);
 
         Challenge challenge = challengeRepository.findById(challengeIdx).orElseThrow(() -> new BaseException(INVALID_CHALLENGE_IDX));
@@ -75,7 +76,7 @@ public class ChallengeService {
             throw new BaseException(INVALID_ATTENDANCE_CODE);
         else {
             ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                    .user(userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_ACCESS_TOKEN)))
+                    .user(userService.getUserWithValidation())
                     .challenge(challengeRepository.findById(attendChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
                     .build();
             challengeAttendanceRepository.save(challengeAttendance);
@@ -88,28 +89,30 @@ public class ChallengeService {
     @Transactional
     public void participateChallenge(PostChallengeReq postChallengeReq) throws BaseException {
         ChallengeAttendance challengeAttendance = ChallengeAttendance.builder()
-                .user(userRepository.findById(authService.getUserIdx()).orElseThrow(()->new BaseException(INVALID_ACCESS_TOKEN)))
+                .user(userService.getUserWithValidation())
                 .challenge(challengeRepository.findById(postChallengeReq.getChallengeIdx()).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX)))
                 .build();
         challengeAttendanceRepository.save(challengeAttendance);
     }
 
-//    /*
-//     * 챌린지 검색
-//     * */
-//    public List<GetChallengesRes> getChallenges(String searchWord) {
-//        Long userIdx = authService.getUserIdx();
-//        if(userIdx == null) throw new BaseException(INVALID_ACCESS_TOKEN);
-//        List<Challenge> challenges = challengeRepository.findByNameContaining(searchWord);
-//        List<Challenge> challengeResult = new ArrayList<>();
-//
-//        for(Challenge challenge : challenges) {
-//            List<ChallengeAttendance> challengeAttendances = challengeAttendanceRepository.findByUser_UserIdxAndChallenge_ChallengeIdx(userIdx, challenge.getChallengeIdx());
-//            if(challengeAttendances == null || challengeAttendances.isEmpty())
-//                challengeResult.add(challenge);
-//        }
-//        return challengeResult.stream().map(challenge -> GetChallengesRes.fromChallenge(challenge, 0L).toList();
-//    }
+    /*
+     * 챌린지 검색
+     * */
+    public List<GetChallengesRes> getChallenges(String searchWord) {
+        User user = userService.getUserWithValidation();
+        List<Challenge> challenges = challengeRepository.findByNameContaining(searchWord);
+        List<Challenge> challengeResult = new ArrayList<>();
+
+        for(Challenge challenge : challenges) {
+            List<ChallengeAttendance> challengeAttendances = challengeAttendanceRepository.findByUserAndChallenge_ChallengeIdx(user, challenge.getChallengeIdx());
+            if(challengeAttendances == null || challengeAttendances.isEmpty())
+                challengeResult.add(challenge);
+        }
+        return challengeResult.stream()
+                .map(challenge -> GetChallengesRes.fromChallenge(challenge, 0))
+                .toList();
+
+    }
 
     // 챌린지 상세 조회
     public BaseResponse<ChallengeDetailResponse> getChallengeDetail(Long userIdx, Long challengeIdx) {

@@ -202,4 +202,10 @@ public class UserService {
         if (userIdx == null) throw new BaseException(NULL_ACCESS_TOKEN);
         return userIdx;
     }
+
+    public User getUserWithValidation() throws BaseException {
+        User user = this.getUserByUserIdx(this.getUserIdxWithValidation());
+        if(user == null) throw new BaseException(INVALID_USER_IDX);
+        return user;
+    }
 }
