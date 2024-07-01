@@ -44,6 +44,10 @@ public enum BaseResponseStatus {
     INVALID_CHALLENGE_IDX(false, HttpStatus.NOT_FOUND, "잘못된 ChallengeIdx 입니다."),
     NO_CHALLENGE(false, HttpStatus.NOT_FOUND, "Challenge 가 존재하지 않습니다."),
 
+    // tag
+    WRONG_TAG_NAME(false, HttpStatus.BAD_REQUEST, "잘못된 태그 종류입니다."),
+    WRONG_TAG_DETAIL(false, HttpStatus.BAD_REQUEST, "잘못된 태그 이름입니다."),
+
     /**
      * Response 오류
      */
