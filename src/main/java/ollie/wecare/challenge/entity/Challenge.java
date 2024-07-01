@@ -28,7 +28,7 @@ public class Challenge extends BaseEntity {
     @Column(name = "challenge_idx")
     private Long challengeIdx;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "program_idx")
     private Program program;
 
@@ -51,5 +51,8 @@ public class Challenge extends BaseEntity {
 
     public void setParticipants(User user) {
         if(user != null) this.participants.add(user);
+    }
+    public void setProgram(Program program) {
+        if(program != null) this.program = program;
     }
 }

@@ -1,6 +1,7 @@
 package ollie.wecare.program.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ollie.wecare.challenge.entity.Challenge;
 import ollie.wecare.challenge.repository.ChallengeRepository;
 import ollie.wecare.common.base.BaseException;
@@ -30,6 +31,7 @@ import static ollie.wecare.common.base.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional
 public class ProgramService {
 
@@ -66,14 +68,11 @@ public class ProgramService {
                 programRepository.findById(programIdx).orElseThrow(()-> new BaseException(INVALID_PROGRAM_IDX)));
     }
 
-    public void saveProgram(PostProgramReq postProgramReq) {
+    //TODO : 연관관계 수정
+    public Challenge saveProgram(PostProgramReq postProgramReq) {
         User user = userService.getUserWithValidation();
         if(!user.getRole().equals(Role.Admin)) throw new BaseException(INVALID_ROLE);
-
-        Program program = PostProgramReq.toProgram(postProgramReq);
-        programRepository.save(program);
-        this.saveTag(postProgramReq, program);
-        //this.saveChallenge(PostProgramReq.toProgram(postProgramReq), user);
+        return this.saveChallenge(PostProgramReq.toProgram(postProgramReq), user);
     }
 
     public void saveTag(PostProgramReq postProgramReq, Program program) {
@@ -81,8 +80,8 @@ public class ProgramService {
         tagRepository.save(Tag.builder().name(TagEnum.getEnumByName(postProgramReq.getLocation())).program(program).build());
     }
 
-    public void saveChallenge(Program program, User user) {
-        challengeRepository.save(Challenge.builder().program(program).name(program.getName()).attendanceRate(0)
-                .admin(user).host(program.getHost()).totalNum(0).build());
+    public Challenge saveChallenge(Program program, User user) {
+        return challengeRepository.save(Challenge.builder().program(program).name(program.getName()).attendanceRate(0)
+                .admin(user).host(program.getHost()).totalNum(10).build());
     }
 }
