@@ -22,6 +22,7 @@ public class GetChallengesAdminRes {
     private Integer participantsCount;
 
     private String location;
+    private String locatedPlace;
 
     private String schedule;
 
@@ -32,6 +33,7 @@ public class GetChallengesAdminRes {
         return GetChallengesAdminRes.builder()
                 .challengeIdx(challenge.getChallengeIdx())
                 .name(challenge.getName())
+                .locatedPlace(challenge.getProgram().getLocatedPlace())
                 .participantsCount(challenge.getParticipants().size())
                 .location(getLocationTag(challenge.getProgram()) != null ? getLocationTag(challenge.getProgram()).getTagName() : null)
                 .schedule(challenge.getProgram().getSchedule())
