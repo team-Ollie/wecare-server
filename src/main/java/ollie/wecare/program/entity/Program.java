@@ -27,7 +27,7 @@ public class Program extends BaseEntity {
 
     private LocalDateTime openDate;
 
-    private String location;
+    //private String location;
 
     private String host;
 

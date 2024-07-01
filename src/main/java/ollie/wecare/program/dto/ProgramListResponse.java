@@ -26,7 +26,7 @@ public record ProgramListResponse(Long programIdx,
                 program.getName(),
                 convertToDateDto(program.getOpenDate()),
                 convertToDateDto(program.getDueDate()),
-                getLocationTag(program) != null ? getCategoryTag(program).getTagName() : null,
+                getLocationTag(program) != null ? getLocationTag(program).getTagName() : null,
                 getCategoryTag(program) != null ? getCategoryTag(program).getTagName() : null);
     }
 
