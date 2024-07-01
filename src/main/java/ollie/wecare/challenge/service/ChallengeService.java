@@ -40,10 +40,39 @@ public class ChallengeService {
     // 참여중인 챌린지 목록 조회
     public BaseResponse<List<GetChallengesRes>> getMyChallenges(Long userIdx) throws BaseException {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        return new BaseResponse<>(challengeRepository.findByParticipantsContaining(user).stream()
-                .map(challenge -> GetChallengesRes.fromChallenge(challenge, calculateMyAchievementRate(user, challenge)))
-                .distinct()
-                .toList());
+        if(user.getRole().equals(Role.Challenger)){
+            return new BaseResponse<>(challengeRepository.findByParticipantsContaining(user).stream()
+                    .map(challenge -> GetChallengesRes.fromChallenge(challenge, calculateMyAchievementRate(user, challenge)))
+                    .distinct()
+                    .toList());
+        }
+        else { // 관리자
+            return new BaseResponse<>(challengeRepository.findByAdmin(user).stream()
+                    .map(challenge -> GetChallengesRes.fromChallenge(challenge, calculateMyAchievementRate(user, challenge)))
+                    .distinct()
+                    .toList());
+        }
+
+    }
+
+    public BaseResponse<List<GetChallengesAdminRes>> getMyChallengesAdmin(Long userIdx) throws BaseException {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        if(user.getRole().equals(Role.Admin)){
+            return new BaseResponse<>(challengeRepository.findByAdmin(user).stream()
+                    .map(challenge -> GetChallengesAdminRes.fromChallenge(challenge))
+                    .distinct()
+                    .toList());
+        }
+        else throw new BaseException(INVALID_ROLE);
+
+    }
+
+    public BaseResponse<List<GetChallengeAdminRes>> getMyChallengeAdmin(Long userIdx, Long challengeIdx) {
+        Challenge challenge = challengeRepository.findById(challengeIdx).orElseThrow(()-> new BaseException(INVALID_CHALLENGE_IDX));
+        if(!challenge.getAdmin().getUserIdx().equals(userIdx)) throw new BaseException(INVALID_ROLE);
+        return new BaseResponse<>(challenge.getParticipants().stream().map(participant -> GetChallengeAdminRes
+                .fromParticipant(participant, challengeAttendanceRepository.countByUserAndChallenge(participant, challenge))).toList());
+
     }
 
     /*
