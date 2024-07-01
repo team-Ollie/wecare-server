@@ -1,6 +1,7 @@
 package ollie.wecare.program.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ollie.wecare.common.base.BaseException;
 import ollie.wecare.common.base.BaseResponse;
 import ollie.wecare.program.dto.GetProgramDetailRes;
@@ -18,6 +19,7 @@ import static ollie.wecare.common.constants.RequestURI.program;
 @RestController
 @RequestMapping(program)
 @RequiredArgsConstructor
+@Slf4j
 public class ProgramController {
     private final ProgramService programService;
 
@@ -42,7 +44,7 @@ public class ProgramController {
     // 프로그램 등록
     @PostMapping
     public BaseResponse<String> saveProgram(@RequestBody PostProgramReq postProgramReq) throws BaseException {
-        programService.saveProgram(postProgramReq);
+        programService.saveTag(postProgramReq, programService.saveProgram(postProgramReq).getProgram());
         return new BaseResponse<>(SUCCESS);
     }
 }
