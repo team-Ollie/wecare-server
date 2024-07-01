@@ -15,6 +15,8 @@ public class PostProgramReq {
 
     private String location;
 
+    private String locatedPlace;
+
     private String host;
 
     private String schedule;
@@ -28,6 +30,7 @@ public class PostProgramReq {
                 .dueDate(convertToLocalDateTime(postProgramReq.getDueDate()))
                 .openDate(convertToLocalDateTime(postProgramReq.getOpenDate()))
                 .host(postProgramReq.getHost())
+                .locatedPlace(postProgramReq.getLocatedPlace())
                 .schedule(postProgramReq.getSchedule())
                 .description(postProgramReq.getDescription())
                 .build();
