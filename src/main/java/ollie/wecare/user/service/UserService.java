@@ -84,7 +84,7 @@ public class UserService {
         if(!encoder.matches(loginRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
 
         JwtDto jwtDto = authService.generateToken(user.getUserIdx());
-        LoginResponse loginResponse = new LoginResponse(jwtDto.accessToken(), jwtDto.refreshToken(), user.getRole().equals(Admin), user.getCenter().getCenterIdx());
+        LoginResponse loginResponse = new LoginResponse(jwtDto.accessToken(), jwtDto.refreshToken(), user.getRole().equals(Admin), user.getCenter().getName());
 
         user.login();
         userRepository.save(user);

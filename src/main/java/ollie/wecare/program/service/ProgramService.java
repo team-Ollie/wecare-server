@@ -39,7 +39,6 @@ public class ProgramService {
     private final UserService userService;
     private final ProgramRepository programRepository;
     private final ChallengeRepository challengeRepository;
-
     private final TagRepository tagRepository;
 
     // 프로그램 월별 조회
