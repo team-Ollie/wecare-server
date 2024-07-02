@@ -27,4 +27,5 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     Optional<Challenge> findTop1ByOrderByCreatedDateDesc();
     Optional<Challenge> findByChallengeIdxAndStatusEquals(Long challengeIdx, String status);
     List<Challenge> findByParticipantsContaining(User user);
+    List<Challenge> findByParticipantsNotContaining(User user);
 }
