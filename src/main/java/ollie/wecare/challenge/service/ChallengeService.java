@@ -59,12 +59,11 @@ public class ChallengeService {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         if(user.getRole().equals(Role.Admin)){
             return new BaseResponse<>(challengeRepository.findByAdmin(user).stream()
-                    .map(challenge -> GetChallengesAdminRes.fromChallenge(challenge))
+                    .map(GetChallengesAdminRes::fromChallenge)
                     .distinct()
                     .toList());
         }
         else throw new BaseException(INVALID_ROLE);
-
     }
 
     public BaseResponse<List<GetChallengeAdminRes>> getMyChallengeAdmin(Long userIdx, Long challengeIdx) {
@@ -72,7 +71,6 @@ public class ChallengeService {
         if(!challenge.getAdmin().getUserIdx().equals(userIdx)) throw new BaseException(INVALID_ROLE);
         return new BaseResponse<>(challenge.getParticipants().stream().map(participant -> GetChallengeAdminRes
                 .fromParticipant(participant, challengeAttendanceRepository.countByUserAndChallenge(participant, challenge))).toList());
-
     }
 
     /*
@@ -107,7 +105,6 @@ public class ChallengeService {
                     .build();
             challengeAttendanceRepository.save(challengeAttendance);
             Integer newAttendanceRate = (int) ((challenge.getAttendanceRate()/(float)100 + (1/(float)((challenge.getTotalNum()) * challenge.getParticipants().size()))) * 100);
-            //log.info("attendanceRate : {}", newAttendanceRate);
             challenge.updateAttendanceRate(newAttendanceRate);
         }
     }
@@ -128,9 +125,8 @@ public class ChallengeService {
         List<Challenge> challenges = challengeRepository.findByNameContainingAndParticipantsNotContaining(searchWord, user);
         return challenges.stream()
                 .distinct()
-                .map(challenge -> SearchChallengeRes.fromChallenge(challenge))
+                .map(SearchChallengeRes::fromChallenge)
                 .toList();
-
     }
 
     // 챌린지 상세 조회
@@ -160,7 +156,6 @@ public class ChallengeService {
     // 챌린지 개인 달성률 계산
     private Integer calculateMyAchievementRate(User user, Challenge challenge) {
         Integer attendanceCount = challengeAttendanceRepository.countByUserAndChallenge(user, challenge);
-        log.info("attendanceCount : {}", attendanceCount);
         if (attendanceCount == null) return 0;
         else return (int)((attendanceCount/(float)challenge.getTotalNum()) * 100);
     }
@@ -179,6 +174,5 @@ public class ChallengeService {
                 .mostAttendancedChallenge(GetChallengeAdRes.fromChallenge(mostAttendancedChallenge))
                 .mostParticipatedChallenge(GetChallengeAdRes.fromChallenge(mostParticipatedChallenge))
                 .mostRecentlyStartedChallenge(GetChallengeAdRes.fromChallenge(mostRecentlyStartedChallenge)).build();
-
     }
 }
