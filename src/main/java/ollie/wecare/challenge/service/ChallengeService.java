@@ -123,12 +123,11 @@ public class ChallengeService {
     public List<SearchChallengeRes> getChallenges(String searchWord) {
         User user = userService.getUserWithValidation();
         if (searchWord.equals("")) {
-            return challengeRepository.findAll().stream()
+            return challengeRepository.findByParticipantsNotContaining(user).stream()
                     .map(SearchChallengeRes::fromChallenge)
                     .toList();
         } else {
-            List<Challenge> challenges = challengeRepository.findByNameContainingAndParticipantsNotContaining(searchWord, user);
-            return challenges.stream()
+            return challengeRepository.findByNameContainingAndParticipantsNotContaining(searchWord, user).stream()
                     .distinct()
                     .map(SearchChallengeRes::fromChallenge)
                     .toList();
