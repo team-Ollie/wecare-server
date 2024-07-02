@@ -34,19 +34,17 @@ public class ChallengeService {
     private final ChallengeAttendanceRepository challengeAttendanceRepository;
     private final UserRepository userRepository;
     private final ChallengeRepository challengeRepository;
-
     private final UserService userService;
 
     // 참여중인 챌린지 목록 조회
-    public BaseResponse<List<GetChallengesRes>> getMyChallenges(Long userIdx) throws BaseException {
+    public BaseResponse<List<GetChallengesRes>> getMyChallenges(Long userIdx) {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        if(user.getRole().equals(Role.Challenger)){
+        if (user.getRole().equals(Role.Challenger)){
             return new BaseResponse<>(challengeRepository.findByParticipantsContaining(user).stream()
                     .map(challenge -> GetChallengesRes.fromChallenge(challenge, calculateMyAchievementRate(user, challenge)))
                     .distinct()
                     .toList());
-        }
-        else { // 관리자
+        } else { // 관리자
             return new BaseResponse<>(challengeRepository.findByAdmin(user).stream()
                     .map(challenge -> GetChallengesRes.fromChallenge(challenge, calculateMyAchievementRate(user, challenge)))
                     .distinct()
@@ -55,7 +53,7 @@ public class ChallengeService {
 
     }
 
-    public BaseResponse<List<GetChallengesAdminRes>> getMyChallengesAdmin(Long userIdx) throws BaseException {
+    public BaseResponse<List<GetChallengesAdminRes>> getMyChallengesAdmin(Long userIdx) {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         if(user.getRole().equals(Role.Admin)){
             return new BaseResponse<>(challengeRepository.findByAdmin(user).stream()
