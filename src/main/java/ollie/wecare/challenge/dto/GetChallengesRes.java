@@ -21,7 +21,7 @@ public class GetChallengesRes {
 
     private Integer participantsCount;
 
-    private String location;
+    //private String location;
 
     private String schedule;
 
@@ -37,7 +37,7 @@ public class GetChallengesRes {
                 .challengeIdx(challenge.getChallengeIdx())
                 .name(challenge.getName())
                 .participantsCount(challenge.getParticipants().size())
-                .location(getLocationTag(challenge.getProgram()) != null ? getLocationTag(challenge.getProgram()).getTagName() : null)
+                //.location(getLocationTag(challenge.getProgram()) != null ? getLocationTag(challenge.getProgram()).getTagName() : null)
                 .schedule(challenge.getProgram().getSchedule())
                 .myAttendanceRate(myAttendanceRate)
                 .locatedPlace(challenge.getProgram().getLocatedPlace())
