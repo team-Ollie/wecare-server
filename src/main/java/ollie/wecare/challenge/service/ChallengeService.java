@@ -122,11 +122,17 @@ public class ChallengeService {
      * */
     public List<SearchChallengeRes> getChallenges(String searchWord) {
         User user = userService.getUserWithValidation();
-        List<Challenge> challenges = challengeRepository.findByNameContainingAndParticipantsNotContaining(searchWord, user);
-        return challenges.stream()
-                .distinct()
-                .map(SearchChallengeRes::fromChallenge)
-                .toList();
+        if (searchWord.equals("")) {
+            return challengeRepository.findAll().stream()
+                    .map(SearchChallengeRes::fromChallenge)
+                    .toList();
+        } else {
+            List<Challenge> challenges = challengeRepository.findByNameContainingAndParticipantsNotContaining(searchWord, user);
+            return challenges.stream()
+                    .distinct()
+                    .map(SearchChallengeRes::fromChallenge)
+                    .toList();
+        }
     }
 
     // 챌린지 상세 조회
