@@ -26,19 +26,19 @@ public class ChallengeController {
 
     // 참여 중인 챌린지 목록 조회
     @GetMapping
-    public BaseResponse<List<GetChallengesRes>> getMyChallenges() throws BaseException {
+    public BaseResponse<List<GetChallengesRes>> getMyChallenges() {
         return challengeService.getMyChallenges(authService.getUserIdx());
     }
 
     // [관리자] 관리자가 생성한 챌린지 목록 조회
     @GetMapping("/admin")
-    public BaseResponse<List<GetChallengesAdminRes>> getMyChallengesAdmin() throws BaseException {
+    public BaseResponse<List<GetChallengesAdminRes>> getMyChallengesAdmin() {
         return challengeService.getMyChallengesAdmin(authService.getUserIdx());
     }
 
     // [관리자] 챌린지 상세 조회
     @GetMapping("/admin/{challengeIdx}")
-    public BaseResponse<List<GetChallengeAdminRes>> getMyChallengeAdmin(@PathVariable(value = "challengeIdx") Long challengeIdx) throws BaseException {
+    public BaseResponse<List<GetChallengeAdminRes>> getMyChallengeAdmin(@PathVariable(value = "challengeIdx") Long challengeIdx) {
         return challengeService.getMyChallengeAdmin(authService.getUserIdx(), challengeIdx);
     }
 
@@ -46,13 +46,12 @@ public class ChallengeController {
     @PostMapping("/attendance/{challengeIdx}")
     public BaseResponse<GetAttendanceCodeReq> getAttendanceCode(@PathVariable(value = "challengeIdx") Long challengeIdx) {
         return new BaseResponse<>(challengeService.getAttendanceCode(challengeIdx));
-
     }
 
     // 챌린지 인증
     //TODO : PathVariable로 변경
     @PostMapping("/attendance")
-    public BaseResponse<String> attendChallenge(@RequestBody AttendChallengeReq attendChallengeReq) throws BaseException {
+    public BaseResponse<String> attendChallenge(@RequestBody AttendChallengeReq attendChallengeReq) {
         challengeService.attendChallenge(attendChallengeReq);
         return new BaseResponse<>(SUCCESS);
     }
@@ -65,14 +64,14 @@ public class ChallengeController {
 
     // 새로운 챌린지 참여
     @PostMapping("/participation")
-    public BaseResponse<String> participateChallenge(@RequestBody PostChallengeReq postChallengeReq) throws BaseException {
+    public BaseResponse<String> participateChallenge(@RequestBody PostChallengeReq postChallengeReq) {
         challengeService.participateChallenge(postChallengeReq);
         return new BaseResponse<>(SUCCESS);
     }
 
     // 챌린지 검색
     @GetMapping("/search")
-    public BaseResponse<List<SearchChallengeRes>> getChallenges(@RequestParam(value = "searchWord", defaultValue = "", required = false) String searchWord)throws BaseException {
+    public BaseResponse<List<SearchChallengeRes>> getChallenges(@RequestParam(value = "searchWord", defaultValue = "", required = false) String searchWord) throws BaseException {
         return new BaseResponse<>(challengeService.getChallenges(searchWord));
     }
 
