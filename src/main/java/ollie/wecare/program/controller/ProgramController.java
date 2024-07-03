@@ -9,11 +9,11 @@ import ollie.wecare.program.dto.GetProgramRes;
 import ollie.wecare.program.dto.PostProgramReq;
 import ollie.wecare.program.dto.ProgramListResponse;
 import ollie.wecare.program.service.ProgramService;
+import ollie.wecare.user.service.AuthService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static ollie.wecare.common.base.BaseResponseStatus.SUCCESS;
 import static ollie.wecare.common.constants.RequestURI.program;
 
 @RestController
@@ -22,6 +22,7 @@ import static ollie.wecare.common.constants.RequestURI.program;
 @Slf4j
 public class ProgramController {
     private final ProgramService programService;
+    private final AuthService authService;
 
     // 프로그램 조회 (월별)
     @GetMapping
@@ -44,7 +45,6 @@ public class ProgramController {
     // 프로그램 등록
     @PostMapping
     public BaseResponse<String> saveProgram(@RequestBody PostProgramReq postProgramReq) throws BaseException {
-        programService.saveTag(postProgramReq, programService.saveProgram(postProgramReq).getProgram());
-        return new BaseResponse<>(SUCCESS);
+        return programService.saveProgram(authService.getUserIdx(), postProgramReq);
     }
 }

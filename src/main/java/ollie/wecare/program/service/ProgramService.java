@@ -17,7 +17,7 @@ import ollie.wecare.program.entity.Tag;
 import ollie.wecare.program.repository.ProgramRepository;
 import ollie.wecare.program.repository.TagRepository;
 import ollie.wecare.user.entity.User;
-import ollie.wecare.user.service.UserService;
+import ollie.wecare.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,10 +36,10 @@ import static ollie.wecare.common.base.BaseResponseStatus.*;
 @Transactional
 public class ProgramService {
 
-    private final UserService userService;
     private final ProgramRepository programRepository;
     private final ChallengeRepository challengeRepository;
     private final TagRepository tagRepository;
+    private final UserRepository userRepository;
 
     // 프로그램 월별 조회
     public List<GetProgramRes> getPrograms(Long year, Long month) {
@@ -68,22 +68,36 @@ public class ProgramService {
                 programRepository.findById(programIdx).orElseThrow(()-> new BaseException(INVALID_PROGRAM_IDX)));
     }
 
-    //TODO : 연관관계 수정
-    public Challenge saveProgram(PostProgramReq postProgramReq) {
-        User user = userService.getUserWithValidation();
-        if(!user.getRole().equals(Role.Admin)) throw new BaseException(INVALID_ROLE);
-        return this.saveChallenge(PostProgramReq.toProgram(postProgramReq), user);
+    // 프로그램 등록
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<String> saveProgram(Long userIdx, PostProgramReq postProgramReq) {
+        User user = userRepository.findByUserIdx(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        if (!user.getRole().equals(Role.Admin)) throw new BaseException(INVALID_ROLE);
+
+        Program newProgram = PostProgramReq.toProgram(postProgramReq);
+        programRepository.save(newProgram);
+
+        saveChallenge(newProgram, user);
+        saveTag(postProgramReq, newProgram);
+        return new BaseResponse<>(SUCCESS);
     }
 
-    public void saveTag(PostProgramReq postProgramReq, Program program) {
+    private void saveTag(PostProgramReq postProgramReq, Program program) {
         tagRepository.save(Tag.builder().name(TagEnum.getEnumByName(postProgramReq.getCategory())).program(program).build());
         tagRepository.save(Tag.builder().name(TagEnum.getEnumByName(postProgramReq.getLocation())).program(program).build());
     }
 
-    public Challenge saveChallenge(Program program, User user) {
+    private void saveChallenge(Program program, User user) {
         Duration duration = Duration.between(program.getOpenDate(), program.getDueDate());
-        Integer totalNum = Math.toIntExact(duration.toDays() / 7);//TODO : 특정 요일 횟수 반영
-        return challengeRepository.save(Challenge.builder().program(program).name(program.getName()).attendanceRate(0)
-                .admin(user).host(program.getHost()).totalNum(totalNum).build());
+        Integer totalNum = Math.toIntExact(duration.toDays() / 7); //TODO : 특정 요일 횟수 반영
+        Challenge newChallenge = Challenge.builder()
+                .program(program)
+                .name(program.getName())
+                .attendanceRate(0)
+                .admin(user)
+                .host(program.getHost())
+                .totalNum(totalNum).build();
+        challengeRepository.save(newChallenge);
     }
+
 }
